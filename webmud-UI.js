@@ -422,7 +422,7 @@ var statHTML = "";
 var statsWindow;
 var ScriptRunDirection = "s";
 var RestMaxPercent = 100;
-var RestMinPercent = 80;
+var RestMinPercent = 40;
 
 //register on click function that either toggles the display of the tools or adds the new divs and checkboxes etc
 function ToolsButton(){
@@ -1026,8 +1026,8 @@ function RunToFordCrossingFromCenterOfSouthport(){
 
 function UpdateRunRestDir() {
 	var UnformattedDirection = ($("#RunDirection").val()); //Grabs Textbox Contents.
-	var RestMaxPercent = (parseInt($("#RestMax").val()));
-	var RestMinPercent = (parseInt($("#RestMin").val()));
+	RestMaxPercent = (parseInt($("#RestMax").val()));
+	RestMinPercent = (parseInt($("#RestMin").val()));
 	if (RestMaxPercent > 100) {RestMaxPercent=100}
 	if (RestMaxPercent < 1) {RestMaxPercent=1}
 	if (RestMinPercent < 1) {RestMinPercent=1}
@@ -1043,8 +1043,8 @@ function UpdateRunRestDir() {
 }
 
 function FixRestPercent(){
-	var RestMaxPercent = (parseInt($("#RestMax").val()));
-	var RestMinPercent = (parseInt($("#RestMin").val()));
+	RestMaxPercent = (parseInt($("#RestMax").val()));
+	RestMinPercent = (parseInt($("#RestMin").val()));
 	if (RestMaxPercent > 100) {RestMaxPercent=100}
 	if (RestMaxPercent < 1) {RestMaxPercent=1}
 	if (RestMinPercent < 1) {RestMinPercent=1}
