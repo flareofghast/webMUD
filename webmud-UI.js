@@ -74,6 +74,38 @@ function gainExperience(actionData) {
 	updateEXPBar();	
 }                        
 
+function mobDropMoney(actionData) {
+    var text = '';
+    for (var k = 0; k < actionData.DroppedCoinRolls.length; k++) {
+        text += buildSpan(cga_light_grayHex, String(actionData.DroppedCoinRolls[k].NumberCoins) + " " + (actionData.DroppedCoinRolls[k].NumberCoins > 1 ? pluralCoinName(actionData.DroppedCoinRolls[k].CoinTypeID) + " drop" : singleCoinName(actionData.DroppedCoinRolls[k].CoinTypeID) + " drops") + " to the ground.") + "<br>";
+        console.log(String(actionData.DroppedCoinRolls[k].NumberCoins) + " + " + String(actionData.DroppedCoinRolls[k].CoinTypeID) );
+    }
+    addMessageRaw(text, false, true);
+    
+//case 1:
+//    return "copper farthings";
+//case 2:
+//    return "silver nobles";
+//case 3:
+//    return "gold crowns";
+//case 4:
+//    return "platinum pieces";
+//case 5:
+//    return "runic coins";
+}
+
+// TODO: update so click on name = telepath to person
+function refreshPlayerList() {
+    hub.server.getPlayersInRealm().done(function (result) {
+            
+        var items = [];
+        $.each(result, function (id, name) {
+            items.push('<li class="list-group-item">' + name + '</li>');
+        });
+        $('#listPlayers').html(items.join(''));
+    });
+}
+
 //makes the direction buttons work
 function MoveClick(moveValue){
 	var movementValue = moveValue;
@@ -434,7 +466,7 @@ var returnTimer = setInterval(function(){
 
 function instance()
 {
-	time += 100;
+	time += 1000;
 
 	elapsed = Math.floor(time / 100) / 10;
 	if(Math.round(elapsed) == elapsed) { elapsed += '.0'; }	
@@ -455,12 +487,9 @@ function instance()
 			$("#ExpPerHour").text(round(EPH) + " Exp/h | Approx. " + round((hoursTilLevel / EPH))  + " hours to level")
 		}
 	}
-
-	var diff = (new Date().getTime() - start) - time;
-	window.setTimeout(instance, (100 - diff));
 }
 
-window.setTimeout(instance, 100);
+var ephID = window.setInterval(instance, 1000);
 
 //Numpad control of movement
 //numlock must be off
@@ -1033,8 +1062,29 @@ if (window.location.pathname === "/Characters/Conversations"){
 		$('#chkEnableAI').parent().remove();
 
 //		add the new stuff
-		$('<div id="divControls" class="panel col-xs-6 col-sm-6 col-md-3 col-lg-3" style="float:left; height:34em; width:21em;"><div style="width:100%"><input type="checkbox" id="chkEnableAI" value="Enable AI">Enable AI</div><div style="float:left;width:100%" class="input-group-sm"><input type="text" class="form-control" style="width:100%;max-width:750px;display:inline-block" id="message" autocomplete="false" autocorrect="false"><input type="button" class="btn" style="width:80px;height:30px;padding:0;" id="sendmessage" value="Send"></div><div id="commandBtns" style="width:100%; padding:2em 0 0 0; float:left;"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="conversationsBtn" value="Conversations" onclick="openConvo()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="statsBtn" value="Stats" onclick="statsWindowOpen()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="mapButton" value="Map" onclick="openMapScreen()"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="expButton" value="Reset Exp/h" onclick="ResetExpPH()"><input type="button" value="Tools" id="tools" style="width:5em; height:2em; padding:0;" class="btn" onclick="ToolsButton()"></div><div style="float:left; width:100%; padding:2em 0 0 0; height:9em;"><select id="PathDropDown" style="width:100%" onchange="PathDropDownSelection()"><option selected="" value="base">Paths and Commands</option></select><span>Rest Below: <input type="number" size="1" id="RestMin" value=' + RestMinPercent + ' min="1" max="100" onchange="FixRestPercent()" style="text-align:center; width: 3em;">% HP</span><br><span>Max: <input type="number" size="1" id="RestMax" value=' + RestMaxPercent + ' min="1" max="100" onchange="FixRestPercent()" style="text-align:center; width: 3em;">% HP</span><span style="margin-left:2em;">Run Dir: <input type="text" size="7" id="RunDirection" value=' + ScriptRunDirection +'></span><span>Enable Scripting: <input type="checkbox" id="EnableScripting" onclick="ScriptingToggle()"></span><span style="margin-left:4.9em;"><input type="submit" value="UPDATE" onclick="UpdateRunRestDir()"></span></div><div id="movement1" style="width:100%; float:left; padding:2em 0 0 3em"><input type="button" id="MoveNW" value="nw" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveN" value="n" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveNE" value="ne" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><div id="movement2" style="width:20%; float:right; padding:0 5em 0 0;"><input type="button" id="MoveUP" value="u" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><br><input type="button" id="MoveDOWN" value="d" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"></div><br><input type="button" id="MoveW" value="w" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveRest" value="Rest" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveE" value="e" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><br><input type="button" id="MoveSW" value="sw" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveS" value="s" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveSE" value="se" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"></div><div style="float:left; width:100%; padding:1em 0 0 1em;"><label id="ExpPerHour">0 Exp/h | Approx. Infinity hours to level</label></div></div><div id="progressMonitors" style="float:left; width:21em;"><div id="hpContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">HP:</div><div class="progress" style="width:90%"><div class="progress-bar" style="width: 100%; background-color: rgb(230, 46, 0);"><span id="hp">151 / 151</span></div></div></div><div id="maContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">MA:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width:100%; background-color:#3366ff;"><span id="ma">3 / 3</span></div></div></div><div id="expContainer" style="width:100%;float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">EXP:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width: 83%; background-color: rgb(0, 179, 0);"><span id="exp">0</span></div></div></div></div>').insertAfter("#mainScreen");
+		$('<div id="divControls" class="panel col-xs-6 col-sm-6 col-md-3 col-lg-3" style="float:left; height:32em; width:21em;"><div style="width:100%"><span>Enable AI: <input type="checkbox" id="chkEnableAI" value="Enable AI"> | </span><span>Enable Scripting: <input type="checkbox" id="EnableScripting" onclick="ScriptingToggle()"></span></div><div style="float:left;width:100%" class="input-group-sm"><input type="text" class="form-control" style="width:100%;max-width:750px;display:inline-block" id="message" autocomplete="false" autocorrect="false"><input type="button" class="btn" style="width:80px;height:30px;padding:0;" id="sendmessage" value="Send"></div><div id="commandBtns" style="width:100%; padding:2em 0 0 0; float:left;"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="conversationsBtn" value="Conversations" onclick="openConvo()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="statsBtn" value="Stats" onclick="statsWindowOpen()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="mapButton" value="Map" onclick="openMapScreen()"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="expButton" value="Reset Exp/h" onclick="ResetExpPH()"><input type="button" value="Tools" id="tools" style="width:5em; height:2em; padding:0;" class="btn" onclick="ToolsButton()"></div></div><div id="progressMonitors" style="float:left; width:21em;"><div style="float:left; width:100%; padding:0 0 0 1em;"><label id="ExpPerHour">0 Exp/h | Approx. Infinity hours to level</label></div><div id="hpContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">HP:</div><div class="progress" style="width:90%"><div class="progress-bar" style="width: 100%; background-color: rgb(230, 46, 0);"><span id="hp">151 / 151</span></div></div></div><div id="maContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">MA:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width:100%; background-color:#3366ff;"><span id="ma">3 / 3</span></div></div></div><div id="expContainer" style="width:100%;float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">EXP:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width: 83%; background-color: rgb(0, 179, 0);"><span id="exp">0</span></div></div></div></div>').insertAfter("#mainScreen");
 		
+		
+		$('<div style="width:100%;"> \
+  <!-- Nav tabs --> \
+  <ul class="nav nav-tabs" role="tablist"> \
+    <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Move</a></li> \
+    <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Heal/Rest</a></li> \
+   <!-- <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Messages</a></li> \
+    <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li> --> \
+  </ul> \
+ \
+  <!-- Tab panes --> \
+  <div class="tab-content"> \
+    <div role="tabpanel" class="tab-pane active" id="home"><select id="PathDropDown" style="width:100%" onchange="PathDropDownSelection()"><option selected="" value="base">Paths and Commands</option></select><div id="movement1" style="width:100%; float:left; padding:2em 0 0 3em"><input type="button" id="MoveNW" value="nw" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveN" value="n" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveNE" value="ne" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><div id="movement2" style="width:20%; float:right; padding:0 5em 0 0;"><input type="button" id="MoveUP" value="u" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><br><input type="button" id="MoveDOWN" value="d" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"></div><br><input type="button" id="MoveW" value="w" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveRest" value="Rest" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveE" value="e" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><br><input type="button" id="MoveSW" value="sw" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveS" value="s" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveSE" value="se" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"></div> \
+</div> \
+    <div role="tabpanel" class="tab-pane" id="profile"><div id="moveRestHeal" style="float:left; width:100%; padding:1em 0 0 0; height:9em;"><span>Rest Below: <input type="number" size="1" id="RestMin" value=' + RestMinPercent + ' min="1" max="100" onchange="FixRestPercent()" style="text-align:center; width: 3em;">% HP</span><br><span>Max: <input type="number" size="1" id="RestMax" value=' + RestMaxPercent + ' min="1" max="100" onchange="FixRestPercent()" style="text-align:center; width: 3em;">% HP</span><span style="margin-left:2em;">Run Dir: <input type="text" size="7" id="RunDirection" value=' + ScriptRunDirection +'></span><span><input type="submit" value="UPDATE" onclick="UpdateRunRestDir()" class="btn" style="height:2em; vertical-align:middle;"></span></div>\
+    </div> \
+    <div role="tabpanel" class="tab-pane" id="messages">...</div> \
+    <div role="tabpanel" class="tab-pane" id="settings">...</div> \
+  </div> \
+ \
+</div>').insertAfter("#commandBtns");
 		
 		$("#message").bind('input', function() {
 			var UnformattedTrigger = ($("#message").val()); //Grabs Textbox Contents.
@@ -1378,6 +1428,9 @@ if (window.location.pathname === "/Characters/Conversations"){
 		$('#chkEnableAI').prop( "checked", true );
 		sendMessageDirect("EnableAI");
 
+		// enables Chupon's scripting
+		$("#EnableScripting").click();
+		
 //		removes existing bars
 		$('.vertical').remove();
 
