@@ -67,89 +67,12 @@ function exp(actionData) {
 }
 
 //added addition to get experience. update the expbar and add the exp earned to curEXP
-function combatRound(actionData) {
-	var text = "";
-	var attackerName;
-	var verbNumber;
-	if (actionData.AttackerID != playerID) {
-		if (actionData.AttackerTypeID === 0) {
-			attackerName = actionData.AttackerName;
-		} else {
-			attackerName = "The " + actionData.AttackerName;
-		}
-		isOrAre = "";
-		verbNumber = 1;
-	} else {
-		attackerName = "You";
-		verbNumber = 0;
-	}
-	var targetName;
-	if (actionData.TargetID != playerID) {
-		targetName = actionData.TargetName;
-	} else {
-		targetName = "you";
-	}
-	for (var i = 0; i < actionData.SwingInfos.length; i++) {
-		switch (actionData.SwingInfos[i].SwingResult) {
-		case 1: //hit
-		case 2: //crit
-			text += buildSpan(cga_light_red, attackerName + " " + (actionData.SwingInfos[i].SwingResult == 2 ? "critically " : "") + actionData.SwingInfos[i].Verbs[verbNumber] + " " + targetName + " for " + String(actionData.SwingInfos[i].Damage) + "!") + "<br>";
-			if (actionData.SwingInfos[i].SwingConsequences && actionData.SwingInfos[i].SwingConsequences.length > 0) {
-				for (var j = 0; j < actionData.SwingInfos[i].SwingConsequences.length; j++) {
-					switch (actionData.SwingInfos[i].SwingConsequences[j].ConsequenceType) {
-					case 0: //drop to ground
-						var dropText = (actionData.TargetID != playerID ? "drops" : "drop");
-						text += buildSpan(cga_light_red, capitalizeFirstLetter(targetName) + " " + dropText + " to the ground!") + "<br>";
-						break;
-					case 1: //death
-						if (actionData.SwingInfos[i].SwingConsequences[j].RIPFigureType == 1) {
-							text += buildSpan(cga_light_grayHex, actionData.SwingInfos[i].SwingConsequences[j].DeathMessage) + "<br>";
-						} else {
-							var isOrAreText = (actionData.TargetID != playerID ? "is" : "are");
-							text += buildSpan(cga_light_red, capitalizeFirstLetter(targetName) + " " + isOrAreText + " dead!") + "<br>";
-						}
-						break;
-					case 3: //gain experience
-						for (var k = 0; k < actionData.SwingInfos[i].SwingConsequences[j].KillerPlayerIDs.length; k++) {
-							if (actionData.SwingInfos[i].SwingConsequences[j].KillerPlayerIDs[k] == playerID) {
-								text += buildSpan(cga_light_grayHex, "You gain " + String(actionData.SwingInfos[i].SwingConsequences[j].ExpEach) + " experience.") + "<br>";
-							}
-						}
-						// added this
-						ExpGained +=  +String(actionData.SwingInfos[i].SwingConsequences[j].ExpEach);
-						curEXP += actionData.SwingInfos[i].SwingConsequences[j].ExpEach;
-						updateEXPBar();				
-						break;
-					case 5: //cashDrop
-						for (var k = 0; k < actionData.SwingInfos[i].SwingConsequences[j].DroppedCoinRolls.length; k++) {
-							text += buildSpan(cga_light_grayHex, String(actionData.SwingInfos[i].SwingConsequences[j].DroppedCoinRolls[k].NumberCoins) + " " + (actionData.SwingInfos[i].SwingConsequences[j].DroppedCoinRolls[k].NumberCoins > 1 ? pluralCoinName(actionData.SwingInfos[i].SwingConsequences[j].DroppedCoinRolls[k].CoinTypeID) + " drop" : singleCoinName(actionData.SwingInfos[i].SwingConsequences[j].DroppedCoinRolls[k].CoinTypeID) + " drops") + " to the ground.") + "<br>";
-						}
-						break;
-					default:
-						break;
-					}
-				}
-			}
-			break;
-		case 0: //miss
-			text += buildSpan(cga_dark_cyan, attackerName + " " + actionData.SwingInfos[i].Verbs[verbNumber] + " at " + targetName + "!") + "<br>";
-			break;
-		case 3: //dodge
-			var dodgeText;
-			if (targetName == "you") {
-				dodgeText = "you dodge";
-			} else {
-				dodgeText = "they dodge";
-			}
-			text += buildSpan(cga_dark_cyan, attackerName + " " + actionData.SwingInfos[i].Verbs[verbNumber] + " at " + targetName + ", but " + dodgeText + " out of the way!") + "<br>";
-			break;
-		case 4: //glance
-			text += buildSpan(cga_light_red, attackerName + " " + actionData.SwingInfos[i].Verbs[verbNumber] + " " + targetName + ", but the swing glances off!") + "<br>";
-			break;
-		}
-	}
-	addMessageRaw(text, false, true);
-}
+function gainExperience(actionData) {
+    addMessageRaw(buildSpan(cga_light_grayHex, "You gain " + String(actionData.Experience) + " experience.") + "<br>", false, true);    
+	ExpGained +=  +String(actionData.Experience);
+	curEXP += actionData.Experience;
+	updateEXPBar();	
+}                        
 
 //makes the direction buttons work
 function MoveClick(moveValue){
@@ -1034,7 +957,7 @@ function UpdateRunRestDir() {
 	if (RestMinPercent > 100) {RestMinPercent=100}
 	if (RestMinPercent > RestMaxPercent) {RestMinPercent = RestMaxPercent}
 	$('#RestMax').val(RestMaxPercent); 
-	$('#RestMin').val(RestMinPercent); 
+ 	$('#RestMin').val(RestMinPercent); 
 	ScriptRunDirection = UnformattedDirection.toLowerCase(); //Converts the text to lowercase and stores it in the variable "PathTriggerCmd"
 	$("#mainScreen").append("<span style='color: cyan'>You will now run: </span><span style='color: yellow'>" + ScriptRunDirection + "," + "<span style='color: cyan'> before resting.</span><br />");
 	$("#mainScreen").append("<span style='color: cyan'>You will now rest if below: </span><span style='color: red'>" + RestMinPercent + "% " + "<span style='color: cyan'>of your total HP.</span><br />");
