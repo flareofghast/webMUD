@@ -68,42 +68,42 @@ function exp(actionData) {
 
 //added addition to get experience. update the expbar and add the exp earned to curEXP
 function gainExperience(actionData) {
-    addMessageRaw(buildSpan(cga_light_grayHex, "You gain " + String(actionData.Experience) + " experience.") + "<br>", false, true);    
+	addMessageRaw(buildSpan(cga_light_grayHex, "You gain " + String(actionData.Experience) + " experience.") + "<br>", false, true);    
 	ExpGained +=  +String(actionData.Experience);
 	curEXP += actionData.Experience;
 	updateEXPBar();	
 }                        
 
 function mobDropMoney(actionData) {
-    var text = '';
-    for (var k = 0; k < actionData.DroppedCoinRolls.length; k++) {
-        text += buildSpan(cga_light_grayHex, String(actionData.DroppedCoinRolls[k].NumberCoins) + " " + (actionData.DroppedCoinRolls[k].NumberCoins > 1 ? pluralCoinName(actionData.DroppedCoinRolls[k].CoinTypeID) + " drop" : singleCoinName(actionData.DroppedCoinRolls[k].CoinTypeID) + " drops") + " to the ground.") + "<br>";
-        console.log(String(actionData.DroppedCoinRolls[k].NumberCoins) + " + " + String(actionData.DroppedCoinRolls[k].CoinTypeID) );
-    }
-    addMessageRaw(text, false, true);
-    
-//case 1:
-//    return "copper farthings";
-//case 2:
-//    return "silver nobles";
-//case 3:
-//    return "gold crowns";
-//case 4:
-//    return "platinum pieces";
-//case 5:
-//    return "runic coins";
+	var text = '';
+	for (var k = 0; k < actionData.DroppedCoinRolls.length; k++) {
+		text += buildSpan(cga_light_grayHex, String(actionData.DroppedCoinRolls[k].NumberCoins) + " " + (actionData.DroppedCoinRolls[k].NumberCoins > 1 ? pluralCoinName(actionData.DroppedCoinRolls[k].CoinTypeID) + " drop" : singleCoinName(actionData.DroppedCoinRolls[k].CoinTypeID) + " drops") + " to the ground.") + "<br>";
+		console.log(String(actionData.DroppedCoinRolls[k].NumberCoins) + " + " + String(actionData.DroppedCoinRolls[k].CoinTypeID) );
+	}
+	addMessageRaw(text, false, true);
+
+//	case 1:
+//	return "copper farthings";
+//	case 2:
+//	return "silver nobles";
+//	case 3:
+//	return "gold crowns";
+//	case 4:
+//	return "platinum pieces";
+//	case 5:
+//	return "runic coins";
 }
 
-// TODO: update so click on name = telepath to person
+//TODO: update so click on name = telepath to person
 function refreshPlayerList() {
-    hub.server.getPlayersInRealm().done(function (result) {
-            
-        var items = [];
-        $.each(result, function (id, name) {
-            items.push('<li class="list-group-item">' + name + '</li>');
-        });
-        $('#listPlayers').html(items.join(''));
-    });
+	hub.server.getPlayersInRealm().done(function (result) {
+
+		var items = [];
+		$.each(result, function (id, name) {
+			items.push('<li class="list-group-item">' + name + '</li>');
+		});
+		$('#listPlayers').html(items.join(''));
+	});
 }
 
 //makes the direction buttons work
@@ -908,7 +908,7 @@ function RunToFordCrossingFromVerdantBog(){
 	toCrossroads.split(",").forEach(function(direction){
 		MoveClick(direction);
 	});
-	
+
 	$('#chkEnableAI').prop( "checked", true );
 	sendMessageDirect("EnableAI");
 }
@@ -921,7 +921,7 @@ function RunToTreasureFromFordCrossing(){
 	toTreasure.split(",").forEach(function(direction){
 		MoveClick(direction);
 	});
-	
+
 	$('#chkEnableAI').prop( "checked", true );
 	sendMessageDirect("EnableAI");
 }
@@ -934,7 +934,7 @@ function RunToFordCrossingFromTreasure(){
 	toTreasure.split(",").reverse().forEach(function(direction){
 		MoveClick(reverseDirection(direction));
 	});
-	
+
 	$('#chkEnableAI').prop( "checked", true );
 	sendMessageDirect("EnableAI");
 }
@@ -947,7 +947,7 @@ function RunToVerdantBogFromFordCrossing(){
 	toCrossroads.split(",").reverse().forEach(function(direction){
 		MoveClick(reverseDirection(direction));
 	});
-	
+
 	$('#chkEnableAI').prop( "checked", true );
 	sendMessageDirect("EnableAI");
 }
@@ -986,7 +986,7 @@ function UpdateRunRestDir() {
 	if (RestMinPercent > 100) {RestMinPercent=100}
 	if (RestMinPercent > RestMaxPercent) {RestMinPercent = RestMaxPercent}
 	$('#RestMax').val(RestMaxPercent); 
- 	$('#RestMin').val(RestMinPercent); 
+	$('#RestMin').val(RestMinPercent); 
 	ScriptRunDirection = UnformattedDirection.toLowerCase(); //Converts the text to lowercase and stores it in the variable "PathTriggerCmd"
 	$("#mainScreen").append("<span style='color: cyan'>You will now run: </span><span style='color: yellow'>" + ScriptRunDirection + "," + "<span style='color: cyan'> before resting.</span><br />");
 	$("#mainScreen").append("<span style='color: cyan'>You will now rest if below: </span><span style='color: red'>" + RestMinPercent + "% " + "<span style='color: cyan'>of your total HP.</span><br />");
@@ -1044,29 +1044,29 @@ function ConfigureUI(){
 
 //	add the new stuff
 	$('<div id="divControls" class="panel col-xs-6 col-sm-6 col-md-3 col-lg-3" style="float:left; height:32em; width:21em;"><div style="width:100%"><span>Enable AI: <input type="checkbox" id="chkEnableAI" value="Enable AI"> | </span><span>Enable Scripting: <input type="checkbox" id="EnableScripting" onclick="ScriptingToggle()"></span></div><div style="float:left;width:100%" class="input-group-sm"><input type="text" class="form-control" style="width:100%;max-width:750px;display:inline-block" id="message" autocomplete="false" autocorrect="false"><input type="button" class="btn" style="width:80px;height:30px;padding:0;" id="sendmessage" value="Send"></div><div id="commandBtns" style="width:100%; padding:2em 0 0 0; float:left;"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="conversationsBtn" value="Conversations" onclick="openConvo()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="statsBtn" value="Stats" onclick="statsWindowOpen()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="mapButton" value="Map" onclick="openMapScreen()"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="expButton" value="Reset Exp/h" onclick="ResetExpPH()"><input type="button" value="Tools" id="tools" style="width:5em; height:2em; padding:0;" class="btn" onclick="ToolsButton()"></div></div><div id="progressMonitors" style="float:left; width:21em;"><div style="float:left; width:100%; padding:0 0 0 1em;"><label id="ExpPerHour">0 Exp/h | Approx. Infinity hours to level</label></div><div id="hpContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">HP:</div><div class="progress" style="width:90%"><div class="progress-bar" style="width: 100%; background-color: rgb(230, 46, 0);"><span id="hp">151 / 151</span></div></div></div><div id="maContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">MA:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width:100%; background-color:#3366ff;"><span id="ma">3 / 3</span></div></div></div><div id="expContainer" style="width:100%;float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">EXP:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width: 83%; background-color: rgb(0, 179, 0);"><span id="exp">0</span></div></div></div></div>').insertAfter("#mainScreen");
-	
-	
+
+
 	$('<div style="width:100%;"> \
-<!-- Nav tabs --> \
-<ul class="nav nav-tabs" role="tablist"> \
-<li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Move</a></li> \
-<li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Heal/Rest</a></li> \
-<!-- <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Messages</a></li> \
-<li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li> --> \
-</ul> \
-\
-<!-- Tab panes --> \
-<div class="tab-content"> \
-<div role="tabpanel" class="tab-pane active" id="home"><select id="PathDropDown" style="width:100%" onchange="PathDropDownSelection()"><option selected="" value="base">Paths and Commands</option></select><div id="movement1" style="width:100%; float:left; padding:2em 0 0 3em"><input type="button" id="MoveNW" value="nw" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveN" value="n" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveNE" value="ne" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><div id="movement2" style="width:20%; float:right; padding:0 5em 0 0;"><input type="button" id="MoveUP" value="u" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><br><input type="button" id="MoveDOWN" value="d" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"></div><br><input type="button" id="MoveW" value="w" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveRest" value="Rest" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveE" value="e" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><br><input type="button" id="MoveSW" value="sw" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveS" value="s" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveSE" value="se" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"></div> \
-</div> \
-<div role="tabpanel" class="tab-pane" id="profile"><div id="moveRestHeal" style="float:left; width:100%; padding:1em 0 0 0; height:9em;"><span>Rest Below: <input type="number" size="1" id="RestMin" value=' + RestMinPercent + ' min="1" max="100" onchange="FixRestPercent()" style="text-align:center; width: 3em;">% HP</span><br><span>Max: <input type="number" size="1" id="RestMax" value=' + RestMaxPercent + ' min="1" max="100" onchange="FixRestPercent()" style="text-align:center; width: 3em;">% HP</span><span style="margin-left:2em;">Run Dir: <input type="text" size="7" id="RunDirection" value=' + ScriptRunDirection +'></span><span>Heal Below: <input type="text" id="healBelow" style="width:3em;"></input>% HP</span><span><input type="submit" value="UPDATE" onclick="UpdateRunRestDir()" class="btn" style="height:2em; padding:0;"></span></div> \
-</div> \
-<div role="tabpanel" class="tab-pane" id="messages">...</div> \
-<div role="tabpanel" class="tab-pane" id="settings">...</div> \
-</div> \
-\
-</div>').insertAfter("#commandBtns");
-	
+			<!-- Nav tabs --> \
+			<ul class="nav nav-tabs" role="tablist"> \
+			<li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Move</a></li> \
+			<li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Heal/Rest</a></li> \
+			<!-- <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Messages</a></li> \
+			<li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li> --> \
+			</ul> \
+			\
+			<!-- Tab panes --> \
+			<div class="tab-content"> \
+			<div role="tabpanel" class="tab-pane active" id="home"><select id="PathDropDown" style="width:100%" onchange="PathDropDownSelection()"><option selected="" value="base">Paths and Commands</option></select><div id="movement1" style="width:100%; float:left; padding:2em 0 0 3em"><input type="button" id="MoveNW" value="nw" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveN" value="n" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveNE" value="ne" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><div id="movement2" style="width:20%; float:right; padding:0 5em 0 0;"><input type="button" id="MoveUP" value="u" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><br><input type="button" id="MoveDOWN" value="d" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"></div><br><input type="button" id="MoveW" value="w" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveRest" value="Rest" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveE" value="e" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><br><input type="button" id="MoveSW" value="sw" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveS" value="s" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveSE" value="se" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"></div> \
+			</div> \
+			<div role="tabpanel" class="tab-pane" id="profile"><div id="moveRestHeal" style="float:left; width:100%; padding:1em 0 0 0; height:9em;"><span>Rest Below: <input type="number" size="1" id="RestMin" value=' + RestMinPercent + ' min="1" max="100" onchange="FixRestPercent()" style="text-align:center; width: 3em;">% HP</span><br><span>Max: <input type="number" size="1" id="RestMax" value=' + RestMaxPercent + ' min="1" max="100" onchange="FixRestPercent()" style="text-align:center; width: 3em;">% HP</span><span style="margin-left:2em;">Run Dir: <input type="text" size="7" id="RunDirection" value=' + ScriptRunDirection +'></span><span>Heal Below: <input type="text" id="healBelow" style="width:3em;"></input>% HP</span><span><input type="submit" value="UPDATE" onclick="UpdateRunRestDir()" class="btn" style="height:2em; padding:0;"></span></div> \
+			</div> \
+			<div role="tabpanel" class="tab-pane" id="messages">...</div> \
+			<div role="tabpanel" class="tab-pane" id="settings">...</div> \
+			</div> \
+			\
+	</div>').insertAfter("#commandBtns");
+
 	$("#message").bind('input', function() {
 		var UnformattedTrigger = ($("#message").val()); //Grabs Textbox Contents.
 		var PathTriggerCmd = UnformattedTrigger.toLowerCase(); //Converts the text to lowercase and stores it in the variable "PathTriggerCmd"
@@ -1214,12 +1214,12 @@ function ConfigureUI(){
 			$('#message').val(""); //This clears the text box after your command is recognized.
 
 			$("#chkEnableAI").click();
-			
+
 			var trainer2tangle = "n,ne,ne,ne,nw,nw,w,nw,nw,sw,w,sw,sw,s,sw,sw,w,s,sw,sw,sw,s,se,s,sw,w,nw,w,sw,w,sw,w,sw,sw,sw,w,w,d,w,sw,nw,n";
 			trainer2tangle.split(",").reverse().forEach(function(dir){
 				MoveClick(reverseDirection(dir));
 			});
-			
+
 			$("#chkEnableAI").click();
 
 			break;
@@ -1227,16 +1227,16 @@ function ConfigureUI(){
 		case '#trainer2tangle': //Start this from the starting town trainer room
 
 			$('#message').val(""); //This clears the text box after your command is recognized.
-			
+
 			$("#chkEnableAI").click();
-			
+
 			var trainer2tangle = "n,ne,ne,ne,nw,nw,w,nw,nw,sw,w,sw,sw,s,sw,sw,w,s,sw,sw,sw,s,se,s,sw,w,nw,w,sw,w,sw,w,sw,sw,sw,w,w,d,w,sw,nw,n";
 			trainer2tangle.split(",").forEach(function(dir){
 				MoveClick(dir);
 			});
-			
+
 			$("#chkEnableAI").click();
-			
+
 			break;			
 
 
@@ -1250,7 +1250,7 @@ function ConfigureUI(){
 			graveyard2trainer.split(",").reverse().forEach(function(dir){
 				MoveClick(reverseDirection(dir));
 			});
-			
+
 			$("#chkEnableAI").click();
 
 			break;
@@ -1265,7 +1265,7 @@ function ConfigureUI(){
 			graveyard2trainer.split(",").forEach(function(dir){
 				MoveClick(dir);
 			});
-			
+
 			$("#chkEnableAI").click();
 
 			break;
@@ -1284,27 +1284,27 @@ function ConfigureUI(){
 		case '#dryad2trainer': //Start from dark dryad boss room in Tanglewood
 
 			$('#message').val(""); //This clears the text box after your command is recognized.
-			
+
 			$("#chkEnableAI").click();
 			var dryad2trainer = "n,ne,n,ne,ne,n,ne,e,se,se,ne,e,ne,n,ne,nw,ne,se,e,s,e,ne,n,se,e,nw,ne,ne,se,e,se,ne,se,e,se,u,e,e,ne,ne,ne,e,ne,e,ne,e,se,e,ne,n,nw,n,ne,ne,ne,n,e,ne,ne,n,ne,ne,e,ne,se,se,e,se,se,sw,sw,sw,s";
 			dryad2trainer.split(",").forEach(function(dir){
 				MoveClick(dir);
 			});
 			$("#chkEnableAI").click();
-			
+
 			break;
 
 		case '#ford2southtrainer': //Start this from the natural ford crossing.
 
 			$('#message').val(""); //This clears the text box after your command is recognized.
-			
+
 			$("#chkEnableAI").click();
-			
+
 			var southtrainer2ford = "n,w,w,w,w,s,s,s,s,s,w,w,w,w,w,w,w,w,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,nw,nw,nw,n,w,w,nw,nw,n,n,n,n,ne,n,ne,n,d,nw,n,e,ne,d,ne,ne,n,n,ne,n,ne,n,ne,n,ne,n,ne,ne,n,ne,se,e,ne,se,se,e,ne,e,ne,e,se,ne,e,ne,n,e,n,ne,ne";
 			southtrainer2ford.split(",").reverse().forEach(function(dir){
 				MoveClick(reverseDirection(dir));
 			});
-			
+
 			$("#chkEnableAI").click();
 
 			break;
@@ -1315,27 +1315,27 @@ function ConfigureUI(){
 			$('#message').val(""); //This clears the text box after your command is recognized.
 
 			$("#chkEnableAI").click();
-			
+
 			var southtrainer2ford = "n,w,w,w,w,s,s,s,s,s,w,w,w,w,w,w,w,w,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,nw,nw,nw,n,w,w,nw,nw,n,n,n,n,ne,n,ne,n,d,nw,n,e,ne,d,ne,ne,n,n,ne,n,ne,n,ne,n,ne,n,ne,ne,n,ne,se,e,ne,se,se,e,ne,e,ne,e,se,ne,e,ne,n,e,n,ne,ne";
 			southtrainer2ford.split(",").forEach(function(dir){
 				MoveClick(dir);
 			});
-			
+
 			$("#chkEnableAI").click();
-			
+
 			break;
 
 		case '#ford2graveyard': //Start this from the Natural Ford Crossing in the river.
 
 			$('#message').val(""); //This clears the text box after your command is recognized.
-			
+
 			$("#chkEnableAI").click();
-			
+
 			var graveyard2ford = "ne,n,ne,n,nw,ne,ne,ne,e,e,ne,e,ne,e,se,ne,ne,e,ne,nw,n,ne,e,ne,e,se,e,e,s,sw,s,s,sw,s,s,s,se,se,s,se,s,s,s,s,sw,s,sw,s,s,s,sw,sw,s,s,sw,sw,s,s,s,s,sw,s,se,e,se,s,s,sw,s,s,sw,sw,s,sw,s,se,s,s,s,se,s,s,se,s,s,s,s,se,se,se";
 			graveyard2ford.split(",").reverse().forEach(function(dir){
 				MoveClick(reverseDirection(dir));
 			});
-			
+
 			$("#chkEnableAI").click();			
 
 			break;
@@ -1343,52 +1343,52 @@ function ConfigureUI(){
 		case '#graveyard2ford': //Start this from the Overgrown Graveyard Entrance Room
 
 			$('#message').val(""); //This clears the text box after your command is recognized.
-			
+
 			$("#chkEnableAI").click();
-			
+
 			var graveyard2ford = "ne,n,ne,n,nw,ne,ne,ne,e,e,ne,e,ne,e,se,ne,ne,e,ne,nw,n,ne,e,ne,e,se,e,e,s,sw,s,s,sw,s,s,s,se,se,s,se,s,s,s,s,sw,s,sw,s,s,s,sw,sw,s,s,sw,sw,s,s,s,s,sw,s,se,e,se,s,s,sw,s,s,sw,sw,s,sw,s,se,s,s,s,se,s,s,se,s,s,s,s,se,se,se";
 			graveyard2ford.split(",").forEach(function(dir){
 				MoveClick(dir);
 			});
-			
+
 			$("#chkEnableAI").click();
-			
+
 			break;
 
 
 		case '#deepwoodtrainer2southporttrainer': //Start this from the starting town trainer room FULL RUN TO SouthportTrainer
 
 			$('#message').val(""); //This clears the text box after your command is recognized.
-			
+
 			$("#chkEnableAI").click();
-			
+
 			var southporttrainer2deepwoodtrainer = "n,w,w,w,w,s,s,s,s,s,w,w,w,w,w,w,w,w,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,nw,nw,nw,n,w,w,nw,nw,n,n,n,n,ne,n,ne,n,d,nw,n,e,ne,d,ne,ne,n,n,ne,n,ne,n,ne,n,ne,n,ne,ne,n,ne,se,e,ne,se,se,e,ne,e,ne,e,se,ne,e,ne,n,e,n,ne,ne,nw,nw,nw,n,n,n,n,nw,n,n,nw,n,n,n,nw,n,ne,n,ne,ne,n,n,ne,n,n,nw,w,nw,n,ne,n,n,n,n,ne,ne,n,n,ne,ne,n,n,n,ne,n,ne,n,n,n,n,nw,n,nw,nw,n,n,n,ne,n,n,ne,n,w,w,nw,w,sw,w,sw,s,se,sw,w,sw,sw,nw,w,sw,w,sw,w,w,sw,sw,sw,se,s,sw,s,sw,ne,n,ne,n,nw,w,w,nw,w,sw,sw,sw,s";
 			southporttrainer2deepwoodtrainer.split(",").reverse().forEach(function(dir){
 				MoveClick(reverseDirection(dir));
 			});
-			
+
 			$("#chkEnableAI").click();
-			
-		break;		
+
+			break;		
 
 		case '#southporttrainer2deepwoodtrainer': //Start this from the Southport trainer. LONG RUN
 
 			$('#message').val(""); //This clears the text box after your command is recognized.
-			
+
 			$("#chkEnableAI").click();
-			
+
 			var southporttrainer2deepwoodtrainer = "n,w,w,w,w,s,s,s,s,s,w,w,w,w,w,w,w,w,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,nw,nw,nw,n,w,w,nw,nw,n,n,n,n,ne,n,ne,n,d,nw,n,e,ne,d,ne,ne,n,n,ne,n,ne,n,ne,n,ne,n,ne,ne,n,ne,se,e,ne,se,se,e,ne,e,ne,e,se,ne,e,ne,n,e,n,ne,ne,nw,nw,nw,n,n,n,n,nw,n,n,nw,n,n,n,nw,n,ne,n,ne,ne,n,n,ne,n,n,nw,w,nw,n,ne,n,n,n,n,ne,ne,n,n,ne,ne,n,n,n,ne,n,ne,n,n,n,n,nw,n,nw,nw,n,n,n,ne,n,n,ne,n,w,w,nw,w,sw,w,sw,s,se,sw,w,sw,sw,nw,w,sw,w,sw,w,w,sw,sw,sw,se,s,sw,s,sw,ne,n,ne,n,nw,w,w,nw,w,sw,sw,sw,s";
 			southporttrainer2deepwoodtrainer.split(",").forEach(function(dir){
 				MoveClick(dir);
 			});
-			
+
 			$("#chkEnableAI").click();
-			
+
 			break;
 		}
 	});
-	
-	
+
+
 	//DROP DOWN PATHS
 	var select = document.getElementById("PathDropDown");
 	var PathArray=["#ResetExpMeter", "#Ford2Southport", "#Southport2Ford", "#DeepwoodTrainer2SouthportTrainer", "#SouthportTrainer2DeepwoodTrainer", 
@@ -1403,15 +1403,15 @@ function ConfigureUI(){
 		el.value = opt;
 		select.appendChild(el);
 	}
-	
-	
+
+
 //	checks the AI and enables
 	$('#chkEnableAI').prop( "checked", true );
 	sendMessageDirect("EnableAI");
 
 	// enables Chupon's scripting
 	$("#EnableScripting").click();
-	
+
 //	removes existing bars
 	$('.vertical').remove();
 
@@ -1474,7 +1474,7 @@ function ConfigureUI(){
 	}, function() {
 		$("#playersDropdown li ul").css("display", "");	
 	});
-	
+
 }
 
 
@@ -1495,136 +1495,130 @@ if (window.location.pathname === "/Characters/Conversations"){
 	}
 } else if(window.location.pathname === "/Characters/Game"){
 	playerName = $(document).attr('title').split(" ")[0];
-	var observer1 = new MutationObserver(function(){
 
-		ConfigureUI();
-		
-		observer.observe($("#mainScreen")[0],options);
-		options = {"attributes":true};
-		observer.observe($("#hp").parent()[0],options);
-
-		observer1.disconnect();
-	});
-	if ($("#mainScreen").children().length === 0){
-		var options1 = {"attributes":true, "characterData":true}
-		observer1.observe($('#playerID')[0],options1);
-	} else {
-		ConfigureUI;
-	}
 //	watches the main screen and culls the DIV children when gets to 5000 (assuming not needing to scroll back too far)
 //	also watches the HP attribute for changes and if the percent is < 20 or >= 100 moves and rests;
 	var count = 1;
+	var firstRun = true;
 	var observer = new MutationObserver(function(mutations){
 
-		if($("#mainScreen").children().length > 5000){
-			$("#mainScreen").children().remove(":lt(3000)");
-		}
+		if(firstRun === true){
+			ConfigureUI();
+			firstRun = false;
+		} else {
 
-		// type your desired item here and this will pick it up if it's in the room, 
-		// will repeat until there are no more of that item.
-		var desired = ["acid gland", "coral necklace"];
-		for(var i = 0; i < desired.length; i++){
-			if(items.indexOf(desired[i]) > -1){
-				sendMessageDirect("get " + desired[i]);
-				sendMessageDirect("");
+			if($("#mainScreen").children().length > 5000){
+				$("#mainScreen").children().remove(":lt(3000)");
 			}
-		}
 
-//		if(statWindow === true){
-//		for(var i = 0; i < mutations.length; i++){
-//		if(mutations[i].addedNodes.length === 67){
-//		for(var k = 0; k < 67; k++){
-//		if(mutations[i].addedNodes[k].outerHTML != undefined){
-//		statHTML += mutations[i].addedNodes[k].outerHTML;
-//		}
-//		}
-//		}
-//		}
+			// type your desired item here and this will pick it up if it's in the room, 
+			// will repeat until there are no more of that item.
+			var desired = ["acid gland", "coral necklace"];
+			for(var i = 0; i < desired.length; i++){
+				if(items.indexOf(desired[i]) > -1){
+					sendMessageDirect("get " + desired[i]);
+					sendMessageDirect("");
+				}
+			}
 
-//		if(statHTML != ""){
-//		openStatsWindow();
-//		statWindow = false;
-//		}
-//		}
+//			if(statWindow === true){
+//			for(var i = 0; i < mutations.length; i++){
+//			if(mutations[i].addedNodes.length === 67){
+//			for(var k = 0; k < 67; k++){
+//			if(mutations[i].addedNodes[k].outerHTML != undefined){
+//			statHTML += mutations[i].addedNodes[k].outerHTML;
+//			}
+//			}
+//			}
+//			}
 
-		// hp check, move and rest
-		// move/rest based on playerName must start with case "name": and end with break; if there is no break; code will fall through to next case!
-//		switch (playerName){
-//		case "Blorgen":
+//			if(statHTML != ""){
+//			openStatsWindow();
+//			statWindow = false;
+//			}
+//			}
+
+			// hp check, move and rest
+			// move/rest based on playerName must start with case "name": and end with break; if there is no break; code will fall through to next case!
+//			switch (playerName){
+//			case "Blorgen":
 //			if(hpPercent <= 40){
-//				if(resting == false && count == 1){
-//					var val = $("#message").val();
-//					MoveClick("s");
-//					sendMessageDirect("rest");
-//					$("#message").val(val);
-//					count -= 1;
-//				}
+//			if(resting == false && count == 1){
+//			var val = $("#message").val();
+//			MoveClick("s");
+//			sendMessageDirect("rest");
+//			$("#message").val(val);
+//			count -= 1;
+//			}
 //			} else if (hpPercent >= 100){
-//				if(count == 0){
-//					var val = $("#message").val();
-//					MoveClick("n");
-//					$("#message").val(val);
-//					count += 1;
-//				}
+//			if(count == 0){
+//			var val = $("#message").val();
+//			MoveClick("n");
+//			$("#message").val(val);
+//			count += 1;
+//			}
 //			}
 //			break;
-//		case "Bjorgen":
+//			case "Bjorgen":
 //			if(hpPercent <= 40){
-//				if(resting == false && count == 1){
-//					var val = $("#message").val();
-//					MoveClick("s");
-//					sendMessageDirect("rest");
-//					$("#message").val(val);
-//					count -= 1;
-//				}
+//			if(resting == false && count == 1){
+//			var val = $("#message").val();
+//			MoveClick("s");
+//			sendMessageDirect("rest");
+//			$("#message").val(val);
+//			count -= 1;
+//			}
 //			} else if (hpPercent >= 100){
-//				if(count == 0){
-//					var val = $("#message").val();
-//					MoveClick("n");
-//					$("#message").val(val);
-//					count += 1;
-//				}
+//			if(count == 0){
+//			var val = $("#message").val();
+//			MoveClick("n");
+//			$("#message").val(val);
+//			count += 1;
+//			}
 //			}
 //			break;
-//		default:
+//			default:
 //			// if name is not either of the last specified
 //			if(hpPercent <= 40){
-//				if(resting == false && count == 1){
-//					var val = $("#message").val();
-//					MoveClick("s");
-//					sendMessageDirect("rest");
-//					$("#message").val(val);
-//					count -= 1;
-//				}
-//			} else if (hpPercent >= 100){
-//				if(count == 0){
-//					var val = $("#message").val();
-//					MoveClick("n");
-//					$("#message").val(val);
-//					count += 1;
-//				}
+//			if(resting == false && count == 1){
+//			var val = $("#message").val();
+//			MoveClick("s");
+//			sendMessageDirect("rest");
+//			$("#message").val(val);
+//			count -= 1;
 //			}
-//		}	
-		
-		if(hpPercent <= RestMinPercent){
-		      var IsScriptingEnabled = document.getElementById('EnableScripting');
-			  if(resting == false && count == 1 && (IsScriptingEnabled.checked)) {  
-		          MoveClick(ScriptRunDirection);
-				  sendMessageDirect("rest");
-				  count -= 1;
-		      }
+//			} else if (hpPercent >= 100){
+//			if(count == 0){
+//			var val = $("#message").val();
+//			MoveClick("n");
+//			$("#message").val(val);
+//			count += 1;
+//			}
+//			}
+//			}	
 
-		  }
-		  else if(hpPercent >= RestMaxPercent){
-		        var IsScriptingEnabled = document.getElementById('EnableScripting');
+			if(hpPercent <= RestMinPercent){
+				var IsScriptingEnabled = document.getElementById('EnableScripting');
+				if(resting == false && count == 1 && (IsScriptingEnabled.checked)) {  
+					MoveClick(ScriptRunDirection);
+					sendMessageDirect("rest");
+					count -= 1;
+				}
+
+			}
+			else if(hpPercent >= RestMaxPercent){
+				var IsScriptingEnabled = document.getElementById('EnableScripting');
 				if(count == 0 && (IsScriptingEnabled.checked)) {
-		            MoveClick(reverseDirection(ScriptRunDirection));
-			         count += 1;
-		        }
-		  }
-		
+					MoveClick(reverseDirection(ScriptRunDirection));
+					count += 1;
+				}
+			}
+		}
 	});
 	var options = {"childList":true};
+	observer.observe($("#mainScreen")[0],options);
+	options = {"attributes":true};
+	observer.observe($("#hp").parent()[0],options);
 
 }
 
