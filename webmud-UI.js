@@ -1,7 +1,7 @@
 /*
  * Blorgen's - Alternate UI and Script
  * 
- * Version 1
+ * Version 1.1
  * 
  * Implemented version numbers.
  * auto minor/major magic heal if below % - if blank spell = no heal.
@@ -10,11 +10,11 @@
  * Exp/hr - modified Cyrix's code
  * Paths drop down + paths - modified Chupon's code
  * Alternate chat "backscroll" - appears below main screen
+ * List command uses denominations (not just copper)
  * 
- * 
- * 
- * 
- * 
+ * BUG FIXES
+ * &nbsp are gone from show room
+ * spell status shows in list command
  * 
  * 
  * 
@@ -473,33 +473,50 @@ function reverseDirection(dir){
 	return newDir;
 }
 
-function listCommand(actionData) {
-	if (actionData.InShop == false) {
-		var text = buildSpan(cga_light_red, "You cannot LIST if you are not in a shop!") + "<br>";
-		addMessageRaw(text, false, true);
-		return;
-	}
-	var text = buildSpan(cga_light_grayHex, "The following items are for sale here:") + "<br><br>";
-	text += buildFormattedSpan(cga_dark_green, "Item", 30, true) + buildFormattedSpan(cga_dark_cyan, "Quantity", 12, true) + buildSpan(cga_dark_cyan, "Price") + "<br>";
-	text += buildSpan(cga_dark_cyan, "------------------------------------------------------") + "<br>";
 
-	if (actionData.ItemsForSale && actionData.ItemsForSale.length > 0) {
-		for (var i = 0; i < actionData.ItemsForSale.length; i++) {
-			if (actionData.ItemsForSale[i].Price % 1000000 === 0 && actionData.ItemsForSale[i].Price != 0){
-				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price / 1000000) + " ", 10, false) + buildSpan(cga_dark_cyan, "runic coins") + "<br>";
+
+function listCommand(actionData) {
+    if (actionData.InShop == false) {
+        var text = buildSpan(cga_light_red, "You cannot LIST if you are not in a shop!") + "<br>";
+        addMessageRaw(text, false, true);
+        return;
+    }
+    var text = buildSpan(cga_light_grayHex, "The following items are for sale here:") + "<br><br>";
+    text += buildFormattedSpan(cga_dark_green, "Item", 30, true) + buildFormattedSpan(cga_dark_cyan, "Quantity", 12, true) + buildSpan(cga_dark_cyan, "Price") + "<br>";
+    text += buildSpan(cga_dark_cyan, "------------------------------------------------------") + "<br>";
+    var canUseStatus = '';
+    if (actionData.ItemsForSale && actionData.ItemsForSale.length > 0) {
+        
+        for (var i = 0; i < actionData.ItemsForSale.length; i++) {
+            switch (actionData.ItemsForSale[i].CanUseStatus) {
+                case 2: //can't use
+                    canUseStatus = ' (You can\'t use)';
+                    break;
+                case 3: //too powerful
+                    canUseStatus = ' (Too powerful)';
+                    break;
+                default:
+                case 1: //can use
+                    canUseStatus = '';
+                    break;
+
+            }
+            if (actionData.ItemsForSale[i].Price % 1000000 === 0 && actionData.ItemsForSale[i].Price != 0){
+				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price / 1000000) + " ", 10, false) + buildSpan(cga_dark_cyan, "runic coins" + canUseStatus) + "<br>";
 			} else if (actionData.ItemsForSale[i].Price % 10000 === 0 && actionData.ItemsForSale[i].Price != 0){
-				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price / 10000) + " ", 10, false) + buildSpan(cga_dark_cyan, "platinum pieces") + "<br>";
+				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price / 10000) + " ", 10, false) + buildSpan(cga_dark_cyan, "platinum pieces" + canUseStatus) + "<br>";
 			} else if (actionData.ItemsForSale[i].Price % 1000 === 0 && actionData.ItemsForSale[i].Price != 0) {
-				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price / 1000) + " ", 10, false) + buildSpan(cga_dark_cyan, "gold crowns") + "<br>";
+				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price / 1000) + " ", 10, false) + buildSpan(cga_dark_cyan, "gold crowns" + canUseStatus) + "<br>";
 			} else if(actionData.ItemsForSale[i].Price % 10 === 0 && actionData.ItemsForSale[i].Price != 0) {
-				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price / 10) + " ", 10, false) + buildSpan(cga_dark_cyan, "silver nobles") + "<br>";
+				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price / 10) + " ", 10, false) + buildSpan(cga_dark_cyan, "silver nobles" + canUseStatus) + "<br>";
 			} else {
-				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price) + " ", 10, false) + buildSpan(cga_dark_cyan, "copper farthings") + "<br>";
+				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price) + " ", 10, false) + buildSpan(cga_dark_cyan, "copper farthings" + canUseStatus) + "<br>";
 			}
-		}
-	}
-	addMessageRaw(text, false, true);
+        }
+    }
+    addMessageRaw(text, false, true);
 }
+
 
 //var returnTimer = setInterval(function(){
 //var val = $("#message").val();
@@ -507,32 +524,32 @@ function listCommand(actionData) {
 //$("#message").val(val);
 //},20000);
 
-function instance()
-{
-	time += 1000;
-
-	elapsed = Math.floor(time / 100) / 10;
-	if(Math.round(elapsed) == elapsed) { elapsed += '.0'; }	
-
-	TimeElapsed = elapsed / 60;
-	var hoursTilLevel = nextEXP - curEXP;
-
-	if(TimeElapsed >= .01){
-		// var calculateEXP = curEXP - ExpGained;
-		var hours = TimeElapsed / 60;
-		EPH = ExpGained / hours;
-		var round = Math.round;		
-		var result = round((round(EPH) / 1000));
-		if(result > 0){
-			$("#ExpPerHour").text(result + "k Exp/h | Approx. " + round((hoursTilLevel / (result * 1000)))  + " hours to level")
-		}
-		else{
-			$("#ExpPerHour").text(round(EPH) + " Exp/h | Approx. " + round((hoursTilLevel / EPH))  + " hours to level")
-		}
-	}
-}
-
-var ephID = window.setInterval(instance, 1000);
+//function instance()
+//{
+//	time += 1000;
+//
+//	elapsed = Math.floor(time / 100) / 10;
+//	if(Math.round(elapsed) == elapsed) { elapsed += '.0'; }	
+//
+//	TimeElapsed = elapsed / 60;
+//	var hoursTilLevel = nextEXP - curEXP;
+//
+//	if(TimeElapsed >= .01){
+//		// var calculateEXP = curEXP - ExpGained;
+//		var hours = TimeElapsed / 60;
+//		EPH = ExpGained / hours;
+//		var round = Math.round;		
+//		var result = round((round(EPH) / 1000));
+//		if(result > 0){
+//			$("#ExpPerHour").text(result + "k Exp/h | Approx. " + round((hoursTilLevel / (result * 1000)))  + " hours to level")
+//		}
+//		else{
+//			$("#ExpPerHour").text(round(EPH) + " Exp/h | Approx. " + round((hoursTilLevel / EPH))  + " hours to level")
+//		}
+//	}
+//}
+//
+//var ephID = window.setInterval(instance, 1000);
 
 //Numpad control of movement
 //numlock must be off
@@ -587,71 +604,70 @@ var ephID = window.setInterval(instance, 1000);
 //});
 
 function showRoom(actionData) {
-	items = "";
-	var mainText = buildSpan(cga_light_cyan, actionData.Name) + "<br>";
-	mainText += buildSpan(cga_light_grayHex, "&nbsp;&nbsp;&nbsp;&nbsp;" + actionData.Description) + "<br>";
-//	var items = "";
-	if (actionData.VisibleCoinRolls && actionData.VisibleCoinRolls.length > 0) {
-		for (var i = 0; i < actionData.VisibleCoinRolls.length; i++) {
-			if (actionData.VisibleCoinRolls[i].Count > 0) {
-				if (items != "") {
-					items += ", ";
-				}
-				items += String(actionData.VisibleCoinRolls[i].Count) + " ";
-				if (actionData.VisibleCoinRolls[i].Count > 1) {
-					items += pluralCoinName(actionData.VisibleCoinRolls[i].CoinTypeID);
-				} else {
-					items += singleCoinName(actionData.VisibleCoinRolls[i].CoinTypeID);
-				}
-			}
-		}
-	}
-	if (actionData.VisibleItems && actionData.VisibleItems.length > 0) {
-
-		for (var i = 0; i < actionData.VisibleItems.length; i++) {
-			if (items != "") {
-				items += ", ";
-			}
-			items += fixStackName(actionData.VisibleItems[i].Count, actionData.VisibleItems[i].Name);
-		}
-
-	}
-	if (items != "") {
-		var youNoticeText = "You notice " + items + " here.";
-		mainText += buildSpan(cga_dark_cyan, youNoticeText) + "<br>";
-	}
-	if (actionData.AlsoHerePlayers.length > 0 || actionData.AlsoHereMobs.length > 0) {
-		var alsoHereText = "Also here: ";
-		var first = true;
-		for (var i = 0; i < actionData.AlsoHerePlayers.length; i++) {
-			if (i > 0) {
-				alsoHereText += ", ";
-			}
-			alsoHereText += actionData.AlsoHerePlayers[i].FirstName;
-			first = false;
-		}
-		for (var i = 0; i < actionData.AlsoHereMobs.length; i++) {
-			if (i > 0 || !first) {
-				alsoHereText += ", ";
-			}
-			alsoHereText += actionData.AlsoHereMobs[i].Name;
-		}
-		alsoHereText += ".";
-		mainText += buildSpan(cga_light_magenta, alsoHereText) + "<br>";
-	}
-	var obviousExits = "Obvious exits: ";
-	if (actionData.ObviousExits && actionData.ObviousExits.length > 0) {
-		for (var i = 0; i < actionData.ObviousExits.length; i++) {
-			if (i > 0) {
-				obviousExits += ", ";
-			}
-			obviousExits += actionData.ObviousExits[i];
-		}
-	} else {
-		obviousExits += "None!";
-	}
-	mainText += buildSpan(cga_dark_green, obviousExits) + "<br>";
-	addMessageRaw(mainText, false, true);
+    var mainText = buildSpan(cga_light_cyan, actionData.Name) + "<br>";
+    mainText +=  "&nbsp;&nbsp;&nbsp;&nbsp;" + buildSpan(cga_light_grayHex, actionData.Description) + "<br>";
+    items = "";
+    if (actionData.VisibleCoinRolls && actionData.VisibleCoinRolls.length > 0) {
+        for (var i = 0; i < actionData.VisibleCoinRolls.length; i++) {
+            if (actionData.VisibleCoinRolls[i].Count > 0) {
+                if (items != "") {
+                    items += ", ";
+                }
+                items += String(actionData.VisibleCoinRolls[i].Count) + " ";
+                if (actionData.VisibleCoinRolls[i].Count > 1) {
+                    items += pluralCoinName(actionData.VisibleCoinRolls[i].CoinTypeID);
+                } else {
+                    items += singleCoinName(actionData.VisibleCoinRolls[i].CoinTypeID);
+                }
+            }
+        }
+    }
+    if (actionData.VisibleItems && actionData.VisibleItems.length > 0) {
+        
+        for (var i = 0; i < actionData.VisibleItems.length; i++) {
+            if (items != "") {
+                items += ", ";
+            }
+            items += fixStackName(actionData.VisibleItems[i].Count, actionData.VisibleItems[i].Name);
+        }
+        
+    }
+    if (items != "") {
+        var youNoticeText = "You notice " + items + " here.";
+        mainText += buildSpan(cga_dark_cyan, youNoticeText) + "<br>";
+    }
+    if (actionData.AlsoHerePlayers.length > 0 || actionData.AlsoHereMobs.length > 0) {
+        var alsoHereText = "Also here: ";
+        var first = true;
+        for (var i = 0; i < actionData.AlsoHerePlayers.length; i++) {
+            if (i > 0) {
+                alsoHereText += ", ";
+            }
+            alsoHereText += actionData.AlsoHerePlayers[i].FirstName;
+            first = false;
+        }
+        for (var i = 0; i < actionData.AlsoHereMobs.length; i++) {
+            if (i > 0 || !first) {
+                alsoHereText += ", ";
+            }
+            alsoHereText += actionData.AlsoHereMobs[i].Name;
+        }
+        alsoHereText += ".";
+        mainText += buildSpan(cga_light_magenta, alsoHereText) + "<br>";
+    }
+    var obviousExits = "Obvious exits: ";
+    if (actionData.ObviousExits && actionData.ObviousExits.length > 0) {
+        for (var i = 0; i < actionData.ObviousExits.length; i++) {
+            if (i > 0) {
+                obviousExits += ", ";
+            }
+            obviousExits += actionData.ObviousExits[i];
+        }
+    } else {
+        obviousExits += "None!";
+    }
+    mainText += buildSpan(cga_dark_green, obviousExits) + "<br>";
+    addMessageRaw(mainText, false, true);
 }
 
 function stat(actionData) {
