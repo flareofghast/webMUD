@@ -5,7 +5,7 @@ updated to incorporate Chupon's UI components.
 Thanks to Cyrix and Chupon for their input to help create this.
 
 ------------------------------------
-Version 1.2
+Version 1.3
 
 * Implemented version numbers.
 * auto minor/major magic heal if below % - if blank spell = no heal.
@@ -15,8 +15,9 @@ Version 1.2
 * Paths drop down + paths - modified Chupon's code
 * Alternate chat "backscroll" - appears below main screen
 * List command uses denominations (not just copper)
+* added version line to UI
 
- * BUG FIXES
- * &nbsp are gone from show room
- * spell status shows in list command
- * exp/hr was turned off (check if was causing lag)
+* BUG FIXES
+* &nbsp are gone from show room
+* spell status shows in list command
+* exp/hr was turned off (check if was causing lag)

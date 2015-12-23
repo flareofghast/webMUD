@@ -1,7 +1,7 @@
 /*
  * Blorgen's - Alternate UI and Script
  * 
- * Version 1.2
+ * Version 1.3
  * 
  * Implemented version numbers.
  * auto minor/major magic heal if below % - if blank spell = no heal.
@@ -11,6 +11,7 @@
  * Paths drop down + paths - modified Chupon's code
  * Alternate chat "backscroll" - appears below main screen
  * List command uses denominations (not just copper)
+ * added version line to UI
  * 
  * BUG FIXES
  * &nbsp are gone from show room
@@ -20,6 +21,8 @@
  * 
  * 
  * */
+var version = 1.3;
+
 
 function inGameTopPlayers(){
 	var match,
@@ -1121,7 +1124,7 @@ function ConfigureUI(){
 
 //	add the new stuff
 	$('<div id="divControls" class="panel col-xs-6 col-sm-6 col-md-3 col-lg-3" style="float:left; height:32em; width:21em;"><div style="width:100%"><span>Enable AI: <input type="checkbox" id="chkEnableAI" value="Enable AI"> | </span><span>Enable Scripting: <input type="checkbox" id="EnableScripting" onclick="ScriptingToggle()"></span></div><div style="float:left;width:100%" class="input-group-sm"><input type="text" class="form-control" style="width:100%;max-width:750px;display:inline-block" id="message" autocomplete="false" autocorrect="false"><input type="button" class="btn" style="width:80px;height:30px;padding:0;" id="sendmessage" value="Send"></div><div id="commandBtns" style="width:100%; padding:2em 0 0 0; float:left;"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="conversationsBtn" value="Conversations" onclick="openConvo()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="statsBtn" value="Stats" onclick="statsWindowOpen()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="mapButton" value="Map" onclick="openMapScreen()"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="expButton" value="Reset Exp/h" onclick="ResetExpPH()"><input type="button" value="Tools" id="tools" style="width:5em; height:2em; padding:0;" class="btn" onclick="ToolsButton()"></div></div><div id="progressMonitors" style="float:left; width:21em;"><div style="float:left; width:100%; padding:0 0 0 1em;"><label id="ExpPerHour">0 Exp/h | Approx. Infinity hours to level</label></div><div id="hpContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">HP:</div><div class="progress" style="width:90%"><div class="progress-bar" style="width: 100%; background-color: rgb(230, 46, 0);"><span id="hp">151 / 151</span></div></div></div><div id="maContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">MA:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width:100%; background-color:#3366ff;"><span id="ma">3 / 3</span></div></div></div><div id="expContainer" style="width:100%;float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">EXP:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width: 83%; background-color: rgb(0, 179, 0);"><span id="exp">0</span></div></div></div></div>').insertAfter("#mainScreen");
-
+	$("#commandBtns").prepend('<span id="version" style="width:100%; float:left; font-size:smaller;">Blorgen\'s script v' + version + '</span>')
 
 	$('<div style="width:100%;"> \
 			<!-- Nav tabs --> \
