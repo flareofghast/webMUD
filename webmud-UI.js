@@ -1,7 +1,7 @@
 /*
  * Blorgen's - Alternate UI and Script
  * 
- * Version 1.1
+ * Version 1.2
  * 
  * Implemented version numbers.
  * auto minor/major magic heal if below % - if blank spell = no heal.
@@ -15,7 +15,7 @@
  * BUG FIXES
  * &nbsp are gone from show room
  * spell status shows in list command
- * 
+ * exp/hr was turned off (check if was causing lag)
  * 
  * 
  * 
@@ -518,38 +518,38 @@ function listCommand(actionData) {
 }
 
 
-//var returnTimer = setInterval(function(){
-//var val = $("#message").val();
-//sendMessageDirect("");
-//$("#message").val(val);
-//},20000);
+var returnTimer = setInterval(function(){
+var val = $("#message").val();
+sendMessageDirect("");
+$("#message").val(val);
+},20000);
 
-//function instance()
-//{
-//	time += 1000;
-//
-//	elapsed = Math.floor(time / 100) / 10;
-//	if(Math.round(elapsed) == elapsed) { elapsed += '.0'; }	
-//
-//	TimeElapsed = elapsed / 60;
-//	var hoursTilLevel = nextEXP - curEXP;
-//
-//	if(TimeElapsed >= .01){
-//		// var calculateEXP = curEXP - ExpGained;
-//		var hours = TimeElapsed / 60;
-//		EPH = ExpGained / hours;
-//		var round = Math.round;		
-//		var result = round((round(EPH) / 1000));
-//		if(result > 0){
-//			$("#ExpPerHour").text(result + "k Exp/h | Approx. " + round((hoursTilLevel / (result * 1000)))  + " hours to level")
-//		}
-//		else{
-//			$("#ExpPerHour").text(round(EPH) + " Exp/h | Approx. " + round((hoursTilLevel / EPH))  + " hours to level")
-//		}
-//	}
-//}
-//
-//var ephID = window.setInterval(instance, 1000);
+function instance()
+{
+	time += 1000;
+
+	elapsed = Math.floor(time / 100) / 10;
+	if(Math.round(elapsed) == elapsed) { elapsed += '.0'; }	
+
+	TimeElapsed = elapsed / 60;
+	var hoursTilLevel = nextEXP - curEXP;
+
+	if(TimeElapsed >= .01){
+		// var calculateEXP = curEXP - ExpGained;
+		var hours = TimeElapsed / 60;
+		EPH = ExpGained / hours;
+		var round = Math.round;		
+		var result = round((round(EPH) / 1000));
+		if(result > 0){
+			$("#ExpPerHour").text(result + "k Exp/h | Approx. " + round((hoursTilLevel / (result * 1000)))  + " hours to level")
+		}
+		else{
+			$("#ExpPerHour").text(round(EPH) + " Exp/h | Approx. " + round((hoursTilLevel / EPH))  + " hours to level")
+		}
+	}
+}
+
+var ephID = window.setInterval(instance, 2000);
 
 //Numpad control of movement
 //numlock must be off
@@ -1687,7 +1687,7 @@ if (window.location.pathname === "/Characters/Conversations"){
 						majorHeal = true;
 						sendMessageText(majorHealSelfSpell);
 						sendMessageDirect("");
-					},3000);
+					},3500);
 				}
 			} else if(hpPercent < minorHealBelowPercent && minorHealSelfSpell != "") {
 //				console.log("in Minor heal");
@@ -1701,7 +1701,7 @@ if (window.location.pathname === "/Characters/Conversations"){
 						minorHeal = true;
 						sendMessageText(minorHealSelfSpell);
 						sendMessageDirect("");
-					},3000);
+					},3500);
 				}
 			} else if(hpPercent >= minorHealBelowPercent){
 				if(healInterval && (minorHeal === true || majorHeal === true)){

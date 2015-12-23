@@ -5,7 +5,7 @@ updated to incorporate Chupon's UI components.
 Thanks to Cyrix and Chupon for their input to help create this.
 
 ------------------------------------
-Version 1.1
+Version 1.2
 
 * Implemented version numbers.
 * auto minor/major magic heal if below % - if blank spell = no heal.
@@ -19,3 +19,4 @@ Version 1.1
  * BUG FIXES
  * &nbsp are gone from show room
  * spell status shows in list command
+ * exp/hr was turned off (check if was causing lag)
