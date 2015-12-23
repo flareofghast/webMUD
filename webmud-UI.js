@@ -67,12 +67,14 @@ function exp(actionData) {
 }
 
 //added addition to get experience. update the expbar and add the exp earned to curEXP
-function gainExperience(actionData) {
-	addMessageRaw(buildSpan(cga_light_grayHex, "You gain " + String(actionData.Experience) + " experience.") + "<br>", false, true);    
+//kap - inheritance
+var wm_gainExperience = window.gainExperience;
+window.gainExperience = function(actionData) {
+	wm_gainExperience(actionData);
 	ExpGained +=  +String(actionData.Experience);
 	curEXP += actionData.Experience;
-	updateEXPBar();	
-}                        
+	updateEXPBar();
+}
 
 function mobDropMoney(actionData) {
 	var text = '';
@@ -126,7 +128,7 @@ function openMapScreen() {
 }
 
 //this searches through the mainScreen and finds and adds gossip messages (needs to either run on a timer or watch mainScreen for changes). Telepaths etc to be added later. Currently in a refresh button.
-//probably have to capture the current contents, with time of addition then somehow compare then update. Currently these all have the same current time added. 
+//probably have to capture the current contents, with time of addition then somehow compare then update. Currently these all have the same current time added.
 function RefreshBackScroll(){
 	checkGossips();
 	checkTelepaths();
@@ -158,7 +160,7 @@ function checkGossips(){
 		if(back.length){
 			$(back).each(function () {
 				if(($(this).next().text() == $(self).next().text())){
-					contains = true;	
+					contains = true;
 				}
 			});
 			if(contains === false && $(self).next().attr("style") == "color:#ff55ff" ) {
@@ -168,7 +170,7 @@ function checkGossips(){
 		} else if($(self).next().attr("style") == "color:#ff55ff" ) {
 			$("#backScrollDiv").append(currentTime()).append($(self).clone()).append($(self).next().clone()).append("<br>");
 		}
-	});	
+	});
 }
 
 //for future implementation of checking for telepaths
@@ -183,7 +185,7 @@ function checkTelepaths(){
 		if(back.length){
 			$(back).each(function () {
 				if( $(self).attr("style") == "color:#00aa00" && ($(this).next().text() == $(self).next().text()) && $(self).next().attr("style") == "color:#aaaaaa"){
-					contains = true;	
+					contains = true;
 				}
 			});
 			if(contains === false && $(self).next().attr("style") == "color:#aaaaaa" && $(self).attr("style") == "color:#00aa00" ) {
@@ -193,7 +195,7 @@ function checkTelepaths(){
 		} else if( $(self).attr("style") == "color:#00aa00" && $(self).next().attr("style") == "color:#aaaaaa" ) {
 			$("#backScrollDiv").append(currentTime()).append($(self).clone()).append($(self).next().clone()).append("<br>");
 		}
-	});	
+	});
 }
 
 //for future implementation of checking for speaking in room
@@ -206,7 +208,7 @@ function checkSpeak(){
 		if(back.length){
 			$(back).each(function () {
 				if( $(self).attr("style") == "color:#00aa00" && $(self).text() == $(this).text()){
-					contains = true;	
+					contains = true;
 				}
 			});
 			if(contains === false && $(self).attr("style") == "color:#00aa00" ) {
@@ -226,7 +228,7 @@ function checkSpeak(){
 		if(back.length){
 			$(back).each(function () {
 				if( $(self).attr("style") == "color:#00aa00" && $(self).text() == $(this).text()){
-					contains = true;	
+					contains = true;
 				}
 			});
 			if(contains === false && $(self).attr("style") == "color:#00aa00" ) {
@@ -249,7 +251,7 @@ function checkYell(){
 		if(back.length){
 			$(back).each(function () {
 				if( $(self).attr("style") == "color:#00aa00" && $(self).text() == $(this).text()){
-					contains = true;	
+					contains = true;
 				}
 			});
 			if(contains === false && $(self).attr("style") == "color:#00aa00" ) {
@@ -269,7 +271,7 @@ function checkYell(){
 		if(back.length){
 			$(back).each(function () {
 				if( $(self).attr("style") == "color:#00aa00" && $(self).text() == $(this).text()){
-					contains = true;	
+					contains = true;
 				}
 			});
 			if(contains === false && $(self).attr("style") == "color:#00aa00" ) {
@@ -291,7 +293,7 @@ function checkBroadcast(){
 		if(back.length){
 			$(back).each(function () {
 				if( $(self).attr("style") == "color:#FFFF00" && $(self).text() == $(this).text()){
-					contains = true;	
+					contains = true;
 				}
 			});
 			if(contains === false && $(self).attr("style") == "color:#FFFF00" ) {
@@ -318,7 +320,7 @@ function checkTelling(){
 		if(back.length){
 			$(back).each(function () {
 				if( $(self).attr("style") == "color:#00aa00" && $(self).text() == $(this).text()){
-					contains = true;	
+					contains = true;
 				}
 			});
 			if(contains == false && $(self).attr("style") == "color:#00aa00" ) {
@@ -343,7 +345,7 @@ function ClearBackScroll(){
 //format current time for adding to front of gossips - set to dd/mm//yyyy
 var currentTime = function(){
 	var d = new Date();
-	var myDate = d.getDate() + "/" + d.getMonth()+ "/" + d.getFullYear(); 
+	var myDate = d.getDate() + "/" + d.getMonth()+ "/" + d.getFullYear();
 	var time = d.toLocaleTimeString().toLowerCase().replace(/([\d]+:[\d]+):[\d]+(\s\w+)/g, "$1$2");
 
 	return ("<span><" + myDate + " - " + time + "> </span>");
@@ -469,7 +471,7 @@ function instance()
 	time += 1000;
 
 	elapsed = Math.floor(time / 100) / 10;
-	if(Math.round(elapsed) == elapsed) { elapsed += '.0'; }	
+	if(Math.round(elapsed) == elapsed) { elapsed += '.0'; }
 
 	TimeElapsed = elapsed / 60;
 	var hoursTilLevel = nextEXP - curEXP;
@@ -478,7 +480,7 @@ function instance()
 		// var calculateEXP = curEXP - ExpGained;
 		var hours = TimeElapsed / 60;
 		EPH = ExpGained / hours;
-		var round = Math.round;		
+		var round = Math.round;
 		var result = round((round(EPH) / 1000));
 		if(result > 0){
 			$("#ExpPerHour").text(result + "k Exp/h | Approx. " + round((hoursTilLevel / (result * 1000)))  + " hours to level")
@@ -493,7 +495,7 @@ var ephID = window.setInterval(instance, 1000);
 
 //Numpad control of movement
 //numlock must be off
-//$(document).keydown(function(e) {  
+//$(document).keydown(function(e) {
 //switch(e.which) {
 //case 35:
 //sendMessageDirect("sw");
@@ -539,8 +541,8 @@ var ephID = window.setInterval(instance, 1000);
 //sendMessageDirect("ne");
 //addMessage("ne", cga_light_grayHex, true, false);
 //e.preventDefault();
-//break;        
-//}      
+//break;
+//}
 //});
 
 function showRoom(actionData) {
@@ -659,7 +661,7 @@ function openStatsWindow(){
 
 //Run to places
 function RunToBrigandFromTown(){
-	var toBrigand = "ne,ne,ne,e,se,e,e,ne,ne,ne,nw,nw,n,ne,ne,n,nw,n,nw,w,nw,n,ne,n,ne,e,se,ne,nw,ne,e,se,e,se,e,ne,e";  
+	var toBrigand = "ne,ne,ne,e,se,e,e,ne,ne,ne,nw,nw,n,ne,ne,n,nw,n,nw,w,nw,n,ne,n,ne,e,se,ne,nw,ne,e,se,e,se,e,ne,e";
 	$('#chkEnableAI').prop( "checked", false );
 	sendMessageDirect("DisableAI");
 
@@ -800,7 +802,7 @@ function RunToGreenmarshesFromVerdantBog(){
 	});
 
 	$('#chkEnableAI').prop( "checked", true );
-	sendMessageDirect("EnableAI");	
+	sendMessageDirect("EnableAI");
 }
 
 function RunToVerdantBogFromGreenmarshes(){
@@ -861,7 +863,7 @@ function RunToSouthportFromSivs(){
 	RunToSouthportFromGreenmarshes();
 
 	$('#chkEnableAI').prop( "checked", true );
-	sendMessageDirect("EnableAI");	
+	sendMessageDirect("EnableAI");
 }
 
 function RunToSivsFromTown(){
@@ -904,7 +906,7 @@ function RunToFordCrossingFromVerdantBog(){
 	$('#chkEnableAI').prop( "checked", false );
 	sendMessageDirect("DisableAI");
 
-	var toCrossroads = "s,se,sw,s,sw,se,se,s,s"; 
+	var toCrossroads = "s,se,sw,s,sw,se,se,s,s";
 	toCrossroads.split(",").forEach(function(direction){
 		MoveClick(direction);
 	});
@@ -917,7 +919,7 @@ function RunToTreasureFromFordCrossing(){
 	$('#chkEnableAI').prop( "checked", false );
 	sendMessageDirect("DisableAI");
 
-	var toTreasure = "e,e,se,s,sw,s,s,sw,s,s,s,s,sw,s,se,se,e,se,e,se,se,e,se,ne,e,ne,n,se,e,ne,n,ne,n,ne,n,ne,n,d,e,se,se,d,e,e,e,e,e,n,e,n,d,se,e,e,d,n,w,s"; 
+	var toTreasure = "e,e,se,s,sw,s,s,sw,s,s,s,s,sw,s,se,se,e,se,e,se,se,e,se,ne,e,ne,n,se,e,ne,n,ne,n,ne,n,ne,n,d,e,se,se,d,e,e,e,e,e,n,e,n,d,se,e,e,d,n,w,s";
 	toTreasure.split(",").forEach(function(direction){
 		MoveClick(direction);
 	});
@@ -930,7 +932,7 @@ function RunToFordCrossingFromTreasure(){
 	$('#chkEnableAI').prop( "checked", false );
 	sendMessageDirect("DisableAI");
 
-	var toTreasure = "e,e,se,s,sw,s,s,sw,s,s,s,s,sw,s,se,se,e,se,e,se,se,e,se,ne,e,ne,n,se,e,ne,n,ne,n,ne,n,ne,n,d,e,se,se,d,e,e,e,e,e,n,e,n,d,se,e,e,d,n,w,s"; 
+	var toTreasure = "e,e,se,s,sw,s,s,sw,s,s,s,s,sw,s,se,se,e,se,e,se,se,e,se,ne,e,ne,n,se,e,ne,n,ne,n,ne,n,ne,n,d,e,se,se,d,e,e,e,e,e,n,e,n,d,se,e,e,d,n,w,s";
 	toTreasure.split(",").reverse().forEach(function(direction){
 		MoveClick(reverseDirection(direction));
 	});
@@ -943,7 +945,7 @@ function RunToVerdantBogFromFordCrossing(){
 	$('#chkEnableAI').prop( "checked", false );
 	sendMessageDirect("DisableAI");
 
-	var toCrossroads = "s,se,sw,s,sw,se,se,s,s"; 
+	var toCrossroads = "s,se,sw,s,sw,se,se,s,s";
 	toCrossroads.split(",").reverse().forEach(function(direction){
 		MoveClick(reverseDirection(direction));
 	});
@@ -953,7 +955,7 @@ function RunToVerdantBogFromFordCrossing(){
 }
 
 function RunToCenterOfSouthportFromFordCrossing(){
-	var toDocks = "s,s,se,s,s,sw,s,s,s,s,sw,s,s,s,se,se,s,s,se,s,s,s,sw,s,s,s,sw,s,se,s,s,s,s,sw,s,s,s,s,s,s,sw,sw,sw,s,s,s,s,s,s,s,s,s,s,s,s,s,s,w,u,w,w,w,n,n,u";  
+	var toDocks = "s,s,se,s,s,sw,s,s,s,s,sw,s,s,s,se,se,s,s,se,s,s,s,sw,s,s,s,sw,s,se,s,s,s,s,sw,s,s,s,s,s,s,sw,sw,sw,s,s,s,s,s,s,s,s,s,s,s,s,s,s,w,u,w,w,w,n,n,u";
 	$('#chkEnableAI').prop( "checked", false );
 	sendMessageDirect("DisableAI");
 
@@ -965,7 +967,7 @@ function RunToCenterOfSouthportFromFordCrossing(){
 }
 
 function RunToFordCrossingFromCenterOfSouthport(){
-	var toDocks = "s,s,se,s,s,sw,s,s,s,s,sw,s,s,s,se,se,s,s,se,s,s,s,sw,s,s,s,sw,s,se,s,s,s,s,sw,s,s,s,s,s,s,sw,sw,sw,s,s,s,s,s,s,s,s,s,s,s,s,s,s,w,u,w,w,w,n,n,u";  
+	var toDocks = "s,s,se,s,s,sw,s,s,s,s,sw,s,s,s,se,se,s,s,se,s,s,s,sw,s,s,s,sw,s,se,s,s,s,s,sw,s,s,s,s,s,s,sw,sw,sw,s,s,s,s,s,s,s,s,s,s,s,s,s,s,w,u,w,w,w,n,n,u";
 	$('#chkEnableAI').prop( "checked", false );
 	sendMessageDirect("DisableAI");
 
@@ -985,8 +987,8 @@ function UpdateRunRestDir() {
 	if (RestMinPercent < 1) {RestMinPercent=1}
 	if (RestMinPercent > 100) {RestMinPercent=100}
 	if (RestMinPercent > RestMaxPercent) {RestMinPercent = RestMaxPercent}
-	$('#RestMax').val(RestMaxPercent); 
-	$('#RestMin').val(RestMinPercent); 
+	$('#RestMax').val(RestMaxPercent);
+	$('#RestMin').val(RestMinPercent);
 	ScriptRunDirection = UnformattedDirection.toLowerCase(); //Converts the text to lowercase and stores it in the variable "PathTriggerCmd"
 	$("#mainScreen").append("<span style='color: cyan'>You will now run: </span><span style='color: yellow'>" + ScriptRunDirection + "," + "<span style='color: cyan'> before resting.</span><br />");
 	$("#mainScreen").append("<span style='color: cyan'>You will now rest if below: </span><span style='color: red'>" + RestMinPercent + "% " + "<span style='color: cyan'>of your total HP.</span><br />");
@@ -1002,8 +1004,8 @@ function FixRestPercent(){
 	if (RestMinPercent < 1) {RestMinPercent=1}
 	if (RestMinPercent > 100) {RestMinPercent=100}
 	if (RestMinPercent > RestMaxPercent) {RestMinPercent = RestMaxPercent}
-	$('#RestMax').val(RestMaxPercent); 
-	$('#RestMin').val(RestMinPercent); 
+	$('#RestMax').val(RestMaxPercent);
+	$('#RestMin').val(RestMinPercent);
 }
 
 
@@ -1014,7 +1016,7 @@ function ScriptingToggle(){
 		sendMessageDirect("");
 	} else {
 		$("#mainScreen").append("<span style='color: red'>** Scripting Disabled **</span><br />");
-		sendMessageDirect("");	
+		sendMessageDirect("");
 	}
 }
 
@@ -1022,7 +1024,7 @@ function PathDropDownSelection(){
 	var DDSelection = "";
 	DDSelection = document.getElementById("PathDropDown").value;
 	DDSelection.toLowerCase(); //Converts the text to lowercase and stores it in the variable "PathTriggerCmd"
-	$('#message').val(DDSelection); 
+	$('#message').val(DDSelection);
 	document.getElementById("PathDropDown").selectedIndex = 0;
 	$("#message").trigger('input');
 }
@@ -1081,56 +1083,56 @@ function ConfigureUI(){
 			$("#mainScreen").append("<br /><span style='color: orange'>******************************************************************************</span><br />");
 			$("#mainScreen").append("<span style='color: #EDAFDE'>Available Commands:</span><br /><br /><span style='color: #EDC9AF'>#Ford2Southport, #Southport2ford, #DeepwoodTrainer2SouthportTrainer, #SouthportTrainer2DeepwoodTrainer, #Trainer2Graveyard, #Graveyard2Trainer, #Trainer2Smithy, #Smithy2Trainer, #Trainer2Pit, #Pit2Trainer, #Tangle2Trainer, #Trainer2Tangle, #Dryad2Trainer, #Ford2SouthTrainer, #SouthTrainer2Ford, #Graveyard2Ford, #Ford2Graveyard, #SivRaiderLair2Ford, #Ford2SivRaiderLair, #Dice<br /></span>");
 			$("#mainScreen").append("<br /><span style='color: orange'>******************************************************************************</span><br /><br />");
-			sendMessageDirect("");			
+			sendMessageDirect("");
 
 			break; // End Of Menu Block
 
 
 		case '#resetscript':
 
-			$('#message').val(""); //This clears the text box after your command is recognized.	
+			$('#message').val(""); //This clears the text box after your command is recognized.
 			$('#hp').html('1%'); // Changes HP bar to 1% health to trigger refresh.
 			count = 1;
 			$("#mainScreen").append("<br /><br /><span style='color: yellow'>** RESETTING HEALTHBARS TO FIX AUTO COMBAT SCRIPT **</span><br />");
-			sendMessageDirect("rest");	
+			sendMessageDirect("rest");
 
 			break;
 
-//			case '#items': 
-//			Item Counter Currently Disabled (For Future Use)	
+//			case '#items':
+//			Item Counter Currently Disabled (For Future Use)
 //			$("#mainScreen").append("<br /><br /><br /><span style='color: white'>******************************************************************************</span><br />");
 //			$("#mainScreen").append("<span style='color: #EDAFDE'>Collected a total of </span>" + NumItemsCollected + "<span> items.</span><br />");
 //			$("#mainScreen").append("<br /><span style='color: white'>******************************************************************************</span><br /><br />");
-//			sendMessageDirect("");		
+//			sendMessageDirect("");
 //			break;
 
 		case '#resetexpmeter':
 			$('#ExpPerHour').trigger('dblclick'); //triggers exp reset doubleclick
 			break;
-		case '#town2wolves': 
+		case '#town2wolves':
 			$('#message').val("");
 			RunToWolvesFromTown();
 			break;
-		case '#wolves2town': 
+		case '#wolves2town':
 			$('#message').val("");
 			RunToTownFromWolves();
 			break;
-		case '#town2verdantbog': 
+		case '#town2verdantbog':
 			$('#message').val("");
 			RunToVerdantBogFromTown();
 			break;
-		case '#verdantbog2town': 
+		case '#verdantbog2town':
 			$('#message').val("");
 			RunToTownFromVerdantBog();
 			break;
-		case '#ford2southport': 
+		case '#ford2southport':
 			$('#message').val("");
 			RunToCenterOfSouthportFromFordCrossing();
 			break;
-		case '#southport2ford': 
+		case '#southport2ford':
 			$('#message').val("");
 			RunToFordCrossingFromCenterOfSouthport();
-			break;	
+			break;
 
 		case '#trainer2smithy':  //Start this from the starting town trainer room
 
@@ -1146,19 +1148,19 @@ function ConfigureUI(){
 			sendMessageDirect("e");
 			sendMessageDirect("s");
 
-			break;		
+			break;
 
-		case '#pit2trainer': //Start this from the first room with monsters in the fighting pits 
+		case '#pit2trainer': //Start this from the first room with monsters in the fighting pits
 
 			$('#message').val(""); //This clears the text box after your command is recognized.
 			sendMessageDirect("u");
 			sendMessageDirect("s");
-			sendMessageDirect("s");			
+			sendMessageDirect("s");
 
 			break;
 
-		case '#ford2sivraiderlair': //Start from ford crossing		
-			$('#message').val(""); //This clears the text box after your command is recognized.			
+		case '#ford2sivraiderlair': //Start from ford crossing
+			$('#message').val(""); //This clears the text box after your command is recognized.
 			sendMessageDirect("sw");
 			sendMessageDirect("sw");
 			sendMessageDirect("s");
@@ -1180,7 +1182,7 @@ function ConfigureUI(){
 
 		case '#sivraiderlair2ford': //Starts in the siv raider room.
 
-			$('#message').val(""); //This clears the text box after your command is recognized.	
+			$('#message').val(""); //This clears the text box after your command is recognized.
 			sendMessageDirect("e");
 			sendMessageDirect("ne");
 			sendMessageDirect("ne");
@@ -1195,7 +1197,7 @@ function ConfigureUI(){
 			sendMessageDirect("e");
 			sendMessageDirect("n");
 			sendMessageDirect("ne");
-			sendMessageDirect("ne");	
+			sendMessageDirect("ne");
 
 			break;
 
@@ -1205,7 +1207,7 @@ function ConfigureUI(){
 			$('#message').val(""); //This clears the text box after your command is recognized.
 			sendMessageDirect("n");
 			sendMessageDirect("n");
-			sendMessageDirect("d");	
+			sendMessageDirect("d");
 
 			break;
 
@@ -1237,7 +1239,7 @@ function ConfigureUI(){
 
 			$("#chkEnableAI").click();
 
-			break;			
+			break;
 
 
 		case '#trainer2graveyard': //Start this from the starting town trainer room
@@ -1336,7 +1338,7 @@ function ConfigureUI(){
 				MoveClick(reverseDirection(dir));
 			});
 
-			$("#chkEnableAI").click();			
+			$("#chkEnableAI").click();
 
 			break;
 
@@ -1369,7 +1371,7 @@ function ConfigureUI(){
 
 			$("#chkEnableAI").click();
 
-			break;		
+			break;
 
 		case '#southporttrainer2deepwoodtrainer': //Start this from the Southport trainer. LONG RUN
 
@@ -1391,7 +1393,7 @@ function ConfigureUI(){
 
 	//DROP DOWN PATHS
 	var select = document.getElementById("PathDropDown");
-	var PathArray=["#ResetExpMeter", "#Ford2Southport", "#Southport2Ford", "#DeepwoodTrainer2SouthportTrainer", "#SouthportTrainer2DeepwoodTrainer", 
+	var PathArray=["#ResetExpMeter", "#Ford2Southport", "#Southport2Ford", "#DeepwoodTrainer2SouthportTrainer", "#SouthportTrainer2DeepwoodTrainer",
 	               "#Trainer2Graveyard", "#Graveyard2Trainer", "#Trainer2Smithy", "#Smithy2Trainer", "#Trainer2Pit", "#Pit2Trainer", "#Tangle2Trainer",
 	               "#Trainer2Tangle", "#Dryad2Trainer", "#Ford2SouthTrainer", "#SouthTrainer2Ford", "#Graveyard2Ford", "#Ford2Graveyard", "#SivRaiderLair2Ford",
 	               "#Ford2SivRaiderLair", "#Dice"];
@@ -1433,7 +1435,7 @@ function ConfigureUI(){
 
 //	if you click on the main screen will activate the input box
 	$('#mainScreen').click(function() {
-		$('#message').focus(); 
+		$('#message').focus();
 	});
 
 	$("#mainScreen").hover(function(){
@@ -1442,8 +1444,8 @@ function ConfigureUI(){
 		$('body').css('overflow', 'scroll');
 	});
 
-//	window.onfocus = function(){ 
-//	$('#message').focus(); 
+//	window.onfocus = function(){
+//	$('#message').focus();
 //	};
 
 	$('<ul class="nav navbar-nav" id="playersDropdown"><li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown">Players<span class="caret"></span></a></button><ul class="dropdown-menu"><li><a href="#" onclick="inGameTopPlayers()" id="topPlayers">Top Players</a></li><li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" id="inRealm">Currently Playing<span class="caret"></span></a></li></li></ul>').insertBefore($("#logoutForm"));
@@ -1472,7 +1474,7 @@ function ConfigureUI(){
 	$("#playersDropdown").hover(function(){
 		$("#playersDropdown li ul").css("display","block");
 	}, function() {
-		$("#playersDropdown li ul").css("display", "");	
+		$("#playersDropdown li ul").css("display", "");
 	});
 
 }
@@ -1511,7 +1513,7 @@ if (window.location.pathname === "/Characters/Conversations"){
 				$("#mainScreen").children().remove(":lt(3000)");
 			}
 
-			// type your desired item here and this will pick it up if it's in the room, 
+			// type your desired item here and this will pick it up if it's in the room,
 			// will repeat until there are no more of that item.
 			var desired = ["acid gland", "coral necklace"];
 			for(var i = 0; i < desired.length; i++){
@@ -1595,11 +1597,11 @@ if (window.location.pathname === "/Characters/Conversations"){
 //			count += 1;
 //			}
 //			}
-//			}	
+//			}
 
 			if(hpPercent <= RestMinPercent){
 				var IsScriptingEnabled = document.getElementById('EnableScripting');
-				if(resting == false && count == 1 && (IsScriptingEnabled.checked)) {  
+				if(resting == false && count == 1 && (IsScriptingEnabled.checked)) {
 					MoveClick(ScriptRunDirection);
 					sendMessageDirect("rest");
 					count -= 1;
