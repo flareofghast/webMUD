@@ -1,3 +1,26 @@
+/*
+ * Blorgen's - Alternate UI and Script
+ * 
+ * Version 1
+ * 
+ * Implemented version numbers.
+ * auto minor/major magic heal if below % - if blank spell = no heal.
+ * run and rest if below % - only one room at this time - modified Chupon's code
+ * pick up items in room
+ * Exp/hr - modified Cyrix's code
+ * Paths drop down + paths - modified Chupon's code
+ * Alternate chat "backscroll" - appears below main screen
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * */
+
 function inGameTopPlayers(){
 	var match,
 	pl = /\+/g,  // Regex for replacing addition symbol with a space
@@ -78,7 +101,7 @@ function mobDropMoney(actionData) {
 	var text = '';
 	for (var k = 0; k < actionData.DroppedCoinRolls.length; k++) {
 		text += buildSpan(cga_light_grayHex, String(actionData.DroppedCoinRolls[k].NumberCoins) + " " + (actionData.DroppedCoinRolls[k].NumberCoins > 1 ? pluralCoinName(actionData.DroppedCoinRolls[k].CoinTypeID) + " drop" : singleCoinName(actionData.DroppedCoinRolls[k].CoinTypeID) + " drops") + " to the ground.") + "<br>";
-		console.log(String(actionData.DroppedCoinRolls[k].NumberCoins) + " + " + String(actionData.DroppedCoinRolls[k].CoinTypeID) );
+		console.log(String(actionData.DroppedCoinRolls[k].NumberCoins) + " + " + String(actionData.DroppedCoinRolls[k].CoinTypeID + pluralCoinName(actionData.DroppedCoinRolls[k].CoinTypeID)) );
 	}
 	addMessageRaw(text, false, true);
 
@@ -362,22 +385,42 @@ function ResetExpPH(){
 var curEXP = 0;
 var nextEXP = 0;
 var expPercent = 0;
-var hpPercent = 0;
-var maPercent = 0;
+var hpPercent = 100;
+var maPercent = 100;
+
+//EXP per hour variabales
 var EPH = 0;
 var TimeElapsed = 0;
 var ExpGained = 0;
 var start = new Date().getTime();
 var time = 0;
 var elapsed = '0.0';
+
+//room items
 var items = "";
+
+//not sure if needed anymore
 var playerName = "";
+
+//brings stats into a separate window
 var statWindow = false;
 var statHTML = "";
 var statsWindow;
-var ScriptRunDirection = "s";
+
+//move/rest scripting
+var scriptRunDirection = "s";
 var RestMaxPercent = 100;
 var RestMinPercent = 40;
+
+//healing
+var minorHealBelowPercent = 80;
+var minorHealSelfSpell = "mend";
+var majorHealBelowPercent = 50;
+var majorHealSelfSpell = "";
+var healInterval;
+var minorHeal = false;
+var majorHeal = false;
+
 
 //register on click function that either toggles the display of the tools or adds the new divs and checkboxes etc
 function ToolsButton(){
@@ -458,11 +501,11 @@ function listCommand(actionData) {
 	addMessageRaw(text, false, true);
 }
 
-var returnTimer = setInterval(function(){
-	var val = $("#message").val();
-	sendMessageDirect("");
-	$("#message").val(val);
-},20000);
+//var returnTimer = setInterval(function(){
+//var val = $("#message").val();
+//sendMessageDirect("");
+//$("#message").val(val);
+//},20000);
 
 function instance()
 {
@@ -978,6 +1021,9 @@ function RunToFordCrossingFromCenterOfSouthport(){
 
 function UpdateRunRestDir() {
 	var UnformattedDirection = ($("#RunDirection").val()); //Grabs Textbox Contents.
+	minorHealBelowPercent = parseInt($("#minorHealBelow").val());
+	majorHealBelowPercent = parseInt($("#majorHealBelow").val());
+
 	RestMaxPercent = (parseInt($("#RestMax").val()));
 	RestMinPercent = (parseInt($("#RestMin").val()));
 	if (RestMaxPercent > 100) {RestMaxPercent=100}
@@ -985,12 +1031,27 @@ function UpdateRunRestDir() {
 	if (RestMinPercent < 1) {RestMinPercent=1}
 	if (RestMinPercent > 100) {RestMinPercent=100}
 	if (RestMinPercent > RestMaxPercent) {RestMinPercent = RestMaxPercent}
+
+	minorHealSelfSpell = $("#minorHealSpell").val();
+	majorHealSelfSpell = $("#majorHealSpell").val();
+	if (minorHealBelowPercent > 100) {minorHealBelowPercent=100}
+	if (minorHealBelowPercent < 1) {minorHealBelowPercent=1}
+	if (majorHealBelowPercent < 1) {majorHealBelowPercent=1}
+	if (majorHealBelowPercent > 100) {majorHealBelowPercent=100}
+	if (majorHealBelowPercent > minorHealBelowPercent) {majorHealBelowPercent = minorHealBelowPercent}
+
 	$('#RestMax').val(RestMaxPercent); 
-	$('#RestMin').val(RestMinPercent); 
-	ScriptRunDirection = UnformattedDirection.toLowerCase(); //Converts the text to lowercase and stores it in the variable "PathTriggerCmd"
-	$("#mainScreen").append("<span style='color: cyan'>You will now run: </span><span style='color: yellow'>" + ScriptRunDirection + "," + "<span style='color: cyan'> before resting.</span><br />");
+	$('#RestMin').val(RestMinPercent);
+	$("#minorHealSpell").val(minorHealSelfSpell);
+	$("#majorHealSpell").val(majorHealSelfSpell);
+	$("#minorHealBelow").val(minorHealBelowPercent);
+	$("#majorHealBelow").val(majorHealBelowPercent);
+	scriptRunDirection = UnformattedDirection.toLowerCase(); //Converts the text to lowercase and stores it in the variable "PathTriggerCmd"
+	$("#mainScreen").append("<span style='color: cyan'>You will now run: </span><span style='color: yellow'>" + scriptRunDirection + "," + "<span style='color: cyan'> before resting.</span><br />");
 	$("#mainScreen").append("<span style='color: cyan'>You will now rest if below: </span><span style='color: red'>" + RestMinPercent + "% " + "<span style='color: cyan'>of your total HP.</span><br />");
 	$("#mainScreen").append("<span style='color: cyan'>You will now rest until reaching: </span><span style='color: green'>" + RestMaxPercent + "% " + "<span style='color: cyan'>of your total HP.</span><br />");
+	minorHealSelfSpell === "" ? "" : $("#mainScreen").append("<span style='color: cyan'>You will now cast <span style='color:yellow;'>" + minorHealSelfSpell + "</span> if below: </span><span style='color: red'>" + minorHealBelowPercent + "% " + "<span style='color: cyan'>of your total HP.</span><br />");
+	majorHealSelfSpell === "" ? "" : $("#mainScreen").append("<span style='color: cyan'>You will now cast <span style='color:yellow;'>" + majorHealSelfSpell + "</span> if below: </span><span style='color: red'>" + majorHealBelowPercent + "% " + "<span style='color: cyan'>of your total HP.</span><br />");
 	sendMessageDirect("");
 }
 
@@ -1059,7 +1120,7 @@ function ConfigureUI(){
 			<div class="tab-content"> \
 			<div role="tabpanel" class="tab-pane active" id="home"><select id="PathDropDown" style="width:100%" onchange="PathDropDownSelection()"><option selected="" value="base">Paths and Commands</option></select><div id="movement1" style="width:100%; float:left; padding:2em 0 0 3em"><input type="button" id="MoveNW" value="nw" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveN" value="n" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveNE" value="ne" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><div id="movement2" style="width:20%; float:right; padding:0 5em 0 0;"><input type="button" id="MoveUP" value="u" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><br><input type="button" id="MoveDOWN" value="d" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"></div><br><input type="button" id="MoveW" value="w" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveRest" value="Rest" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveE" value="e" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><br><input type="button" id="MoveSW" value="sw" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveS" value="s" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"><input type="button" id="MoveSE" value="se" onclick="MoveClick(value)" style="width:3em; height:3em; padding:0;" class="btn"></div> \
 			</div> \
-			<div role="tabpanel" class="tab-pane" id="profile"><div id="moveRestHeal" style="float:left; width:100%; padding:1em 0 0 0; height:9em;"><span>Rest Below: <input type="number" size="1" id="RestMin" value=' + RestMinPercent + ' min="1" max="100" onchange="FixRestPercent()" style="text-align:center; width: 3em;">% HP</span><br><span>Max: <input type="number" size="1" id="RestMax" value=' + RestMaxPercent + ' min="1" max="100" onchange="FixRestPercent()" style="text-align:center; width: 3em;">% HP</span><span style="margin-left:2em;">Run Dir: <input type="text" size="7" id="RunDirection" value=' + ScriptRunDirection +'></span><span>Heal Below: <input type="text" id="healBelow" style="width:3em;"></input>% HP</span><span><input type="submit" value="UPDATE" onclick="UpdateRunRestDir()" class="btn" style="height:2em; padding:0;"></span></div> \
+			<div role="tabpanel" class="tab-pane" id="profile"><div id="moveRestHeal" style="float:left; width:100%; padding:1em 0 0 0; height:9em;"><span>Rest Below: <input type="number" size="1" id="RestMin" value=' + RestMinPercent + ' min="1" max="100" onchange="FixRestPercent()" style="text-align:center; width: 3em;">% HP</span><br><span>Max: <input type="number" size="1" id="RestMax" value=' + RestMaxPercent + ' min="1" max="100" onchange="FixRestPercent()" style="text-align:center; width: 3em;">% HP</span><span style="margin-left:2em;">Run Dir: <input type="text" size="7" id="RunDirection" value=' + scriptRunDirection +'></span><div id="magic"><span style="display:block; ">Minor Heal Below: <input type="text" id="minorHealBelow" value="' + minorHealBelowPercent + '" style="width:3em;"></input>% HP</span><span style="display:block;">Minor Heal Self Spell: <input type="text" id="minorHealSpell" value="' + minorHealSelfSpell + '" style="width:5em;"></input></span><span style="display:block; ">Major Heal Below: <input type="text" id="majorHealBelow" value="' + majorHealBelowPercent + '" style="width:3em;"></input>% HP</span><span style="display:block; ">Major Heal Self Spell: <input type="text" id="majorHealSpell" value="' + majorHealSelfSpell + '" style="width:5em;"></input></span></div><span><input type="submit" value="UPDATE" onclick="UpdateRunRestDir()" class="btn" style="height:2em; padding:0;"></span></div> \
 			</div> \
 			<div role="tabpanel" class="tab-pane" id="messages">...</div> \
 			<div role="tabpanel" class="tab-pane" id="settings">...</div> \
@@ -1477,7 +1538,6 @@ function ConfigureUI(){
 
 }
 
-
 if (window.location.pathname === "/Characters/Conversations"){
 	$('<input id="chkScrollToBottom" type="checkbox"><span>scroll to bottom?</span></input>').insertAfter("#divConversations");
 	$("#chkScrollToBottom").click();
@@ -1507,13 +1567,14 @@ if (window.location.pathname === "/Characters/Conversations"){
 			firstRun = false;
 		} else {
 
+			// remove children entities from mud screen
 			if($("#mainScreen").children().length > 5000){
 				$("#mainScreen").children().remove(":lt(3000)");
 			}
 
 			// type your desired item here and this will pick it up if it's in the room, 
 			// will repeat until there are no more of that item.
-			var desired = ["acid gland", "coral necklace"];
+			var desired = ["acid gland", "coprolite necklace"];
 			for(var i = 0; i < desired.length; i++){
 				if(items.indexOf(desired[i]) > -1){
 					sendMessageDirect("get " + desired[i]);
@@ -1597,10 +1658,49 @@ if (window.location.pathname === "/Characters/Conversations"){
 //			}
 //			}	
 
+			// healing logic - currently working on
+			if(hpPercent < majorHealBelowPercent && majorHealSelfSpell != ""){
+//				console.log("in Major heal");	
+				if(healInterval && majorHeal === false && minorHeal === true){
+					clearInterval(healInterval);
+					minorHeal = false;
+					healInterval = undefined;
+				}
+				if(healInterval === undefined && majorHeal != true){
+					healInterval = setInterval(function(){
+						majorHeal = true;
+						sendMessageText(majorHealSelfSpell);
+						sendMessageDirect("");
+					},3000);
+				}
+			} else if(hpPercent < minorHealBelowPercent && minorHealSelfSpell != "") {
+//				console.log("in Minor heal");
+				if(healInterval != undefined && minorHeal === false && majorHeal === true){
+					majorHeal = false;
+					clearInterval(healInterval);
+					healInterval = undefined;
+				} 
+				if(healInterval === undefined && minorHeal != true){
+					healInterval = setInterval(function(){
+						minorHeal = true;
+						sendMessageText(minorHealSelfSpell);
+						sendMessageDirect("");
+					},3000);
+				}
+			} else if(hpPercent >= minorHealBelowPercent){
+				if(healInterval && (minorHeal === true || majorHeal === true)){
+					clearInterval(healInterval);
+				}
+				minorHeal = false;
+				majorHeal = false;
+				healInterval = undefined;
+			}
+
+
 			if(hpPercent <= RestMinPercent){
 				var IsScriptingEnabled = document.getElementById('EnableScripting');
 				if(resting == false && count == 1 && (IsScriptingEnabled.checked)) {  
-					MoveClick(ScriptRunDirection);
+					MoveClick(scriptRunDirection);
 					sendMessageDirect("rest");
 					count -= 1;
 				}
@@ -1609,7 +1709,7 @@ if (window.location.pathname === "/Characters/Conversations"){
 			else if(hpPercent >= RestMaxPercent){
 				var IsScriptingEnabled = document.getElementById('EnableScripting');
 				if(count == 0 && (IsScriptingEnabled.checked)) {
-					MoveClick(reverseDirection(ScriptRunDirection));
+					MoveClick(reverseDirection(scriptRunDirection));
 					count += 1;
 				}
 			}
