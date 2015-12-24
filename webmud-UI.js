@@ -1,6 +1,10 @@
 /*
  * Blorgen's - Alternate UI and Script
  * 
+ * Version 1.5
+ * 
+ * compatible with latest changes
+ * 
  * Version 1.4
  * 
  * Implemented version numbers.
@@ -25,7 +29,7 @@
  * 
  * 
  * */
-var version = 1.4;
+var version = 1.5;
 
 
 function inGameTopPlayers(){
@@ -1139,7 +1143,7 @@ function ConfigureUI(){
 	//		hides the players (thinking of moving this to the top bar)
 	$("#divPlayers").toggle(false);
 
-//	enlarges the mainscreen
+	//	enlarges the mainscreen
 	$('#divMainPanel').removeClass('col-lg-10').addClass('col-lg-12');
 
 //	resize the mainscreen to fit on my page (should adjust for different screens/resolutions due to using ems
@@ -1147,7 +1151,9 @@ function ConfigureUI(){
 
 //	remove the existing input stuff
 	$('#message').parent().remove();
-	$('#chkEnableAI').parent().remove();
+	$("#divMainPanel").html($("#divMainPanel").children())
+	$('#chkEnableAI').remove();
+	
 
 //	add the new stuff
 	$('<div id="divControls" class="panel col-xs-6 col-sm-6 col-md-3 col-lg-3" style="float:left; height:32em; width:21em;"><div style="width:100%"><span>Enable AI: <input type="checkbox" id="chkEnableAI" value="Enable AI"> | </span><span>Enable Scripting: <input type="checkbox" id="EnableScripting" onclick="ScriptingToggle()"></span></div><div style="float:left;width:100%" class="input-group-sm"><input type="text" class="form-control" style="width:100%;max-width:750px;display:inline-block" id="message" autocomplete="false" autocorrect="false"><input type="button" class="btn" style="width:80px;height:30px;padding:0;" id="sendmessage" value="Send"></div><div id="commandBtns" style="width:100%; padding:1em 0 0 0; float:left;"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="conversationsBtn" value="Conversations" onclick="openConvo()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="statsBtn" value="Stats" onclick="statsWindowOpen()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="mapButton" value="Map" onclick="openMapScreen()"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="expButton" value="Reset Exp/h" onclick="ResetExpPH()"><input type="button" value="Tools" id="tools" style="width:5em; height:2em; padding:0;" class="btn" onclick="ToolsButton()"></div></div><div id="progressMonitors" style="float:left; width:21em;"><div style="float:left; width:100%; padding:0 0 0 1em;"><label id="ExpPerHour">0 Exp/h | Approx. Infinity hours to level</label></div><div id="hpContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">HP:</div><div class="progress" style="width:90%"><div class="progress-bar" style="width: 100%; background-color: rgb(230, 46, 0);"><span id="hp">151 / 151</span></div></div></div><div id="maContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">MA:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width:100%; background-color:#3366ff;"><span id="ma">3 / 3</span></div></div></div><div id="expContainer" style="width:100%;float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">EXP:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width: 83%; background-color: rgb(0, 179, 0);"><span id="exp">0</span></div></div></div></div>').insertAfter("#mainScreen");

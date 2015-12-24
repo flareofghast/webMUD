@@ -7,6 +7,11 @@ Thanks to Cyrix and Chupon for their input to help create this.
 ------------------------------------
  * Blorgen's - Alternate UI and Script
  * 
+ * Version 1.5
+ * 
+ * compatible with latest changes
+ *
+ *
  * Version 1.4
  * 
  * Implemented version numbers.
