@@ -1073,7 +1073,8 @@ function UpdateRunRestDir() {
 	$("#mainScreen").append("<span style='color: cyan'>You will now run: </span><span style='color: yellow'>" + scriptRunDirection + "," + "<span style='color: cyan'> before resting.</span><br />");
 	$("#mainScreen").append("<span style='color: cyan'>You will now rest if below: </span><span style='color: red'>" + RestMinPercent + "% " + "<span style='color: cyan'>of your total HP.</span><br />");
 	$("#mainScreen").append("<span style='color: cyan'>You will now rest until reaching: </span><span style='color: green'>" + RestMaxPercent + "% " + "<span style='color: cyan'>of your total HP.</span><br />");
-	$("#mainScreen").append("<span style='color: cyan'>You will : </span><span style='color: yellow'>" + preRestCommand + "</span>," + "<span style='color: cyan'> before resting and:<span style='color: yellow'>" + postRestCommand + "</span> after resting.</span><br />");
+	preRestCommand === "" ? "" : $("#mainScreen").append("<span style='color: cyan'>You will : </span><span style='color: yellow'>" + preRestCommand + "</span>" + "<span style='color: cyan'> before resting.</span><br />");
+	postRestCommand === "" ? "" : $("#mainScreen").append("<span style='color: cyan'>You will : </span><span style='color: yellow'>" + postRestCommand + "</span>" + "<span style='color: cyan'> after resting.</span><br />");
 	sendMessageDirect("");
 }
 
