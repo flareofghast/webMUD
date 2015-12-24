@@ -44,7 +44,7 @@ function stat(actionData) {
 // stores the exp details
 var curEXP = 0;
 var nextEXP = 0;
-var expPercent = 0;
+var myEXPPercent = 0;
 var hpPercent = 0;
 var maPercent = 0;
 var playerName = "";
@@ -80,12 +80,12 @@ function updateHPMABars() {
 // updates the EXP bar
 function updateEXPBar() {
     var exp =  $("#exp");
-    expPercent = Math.floor(curEXP * 100 / nextEXP);
+    myEXPPercent = Math.floor(curEXP * 100 / nextEXP);
     $(exp).html(String(curEXP) + " / " + String(nextEXP));
     if(String($(exp).html()).split('%')[0] > 100){
         $(exp).parent().css("width","100%");
     } else {
-        $(exp).parent().css("width",String(expPercent) + "%");
+        $(exp).parent().css("width",String(myEXPPercent) + "%");
     }
 }
  
@@ -99,7 +99,7 @@ function exp(actionData) {
     if (extraExpNeeded < 0) {
         extraExpNeeded = 0;
     }
-    var text = buildSpan(cga_dark_green, "Exp: ") + buildSpan(cga_dark_cyan, String(actionData.Exp)) + buildSpan(cga_dark_green, " Level: ") + buildSpan(cga_dark_cyan, String(actionData.Level)) + buildSpan(cga_dark_green, " Exp needed for next level: ") + buildSpan(cga_dark_cyan, String(extraExpNeeded) + " (" + String(actionData.TotalExpForNextLevel) + ") [" + expPercent + "%]") + "<br>";
+    var text = buildSpan(cga_dark_green, "Exp: ") + buildSpan(cga_dark_cyan, String(actionData.Exp)) + buildSpan(cga_dark_green, " Level: ") + buildSpan(cga_dark_cyan, String(actionData.Level)) + buildSpan(cga_dark_green, " Exp needed for next level: ") + buildSpan(cga_dark_cyan, String(extraExpNeeded) + " (" + String(actionData.TotalExpForNextLevel) + ") [" + myEXPPercent + "%]") + "<br>";
     addMessageRaw(text, false, true);
 }
  

@@ -1,4 +1,4 @@
-# webMUD
+# Blorgen's WebMUD UI and Script
 
 Use webmud-UI.js. Will be the latest version of my code.
 updated to incorporate Chupon's UI components.
@@ -7,6 +7,11 @@ Thanks to Cyrix and Chupon for their input to help create this.
 ------------------------------------
  * Blorgen's - Alternate UI and Script
  * 
+ * Version 1.6
+ *
+ * changed some overrides so as to not mess with Vitoc's code
+ * configure player at end of code; including get items
+ *
  * Version 1.5
  * 
  * compatible with latest changes

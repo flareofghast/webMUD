@@ -1,6 +1,13 @@
 /*
  * Blorgen's - Alternate UI and Script
  * 
+ * 
+ * Version 1.6
+ * 
+ * changed some overrides so as to not mess with Vitoc's code
+ * configure player at end of code; including get items
+ * 
+ * 
  * Version 1.5
  * 
  * compatible with latest changes
@@ -29,7 +36,7 @@
  *
  *
  * */
-var version = 1.5;
+var version = 1.6;
 
 
 function inGameTopPlayers(){
@@ -77,27 +84,22 @@ function updateHPMABars() {
 //updates the EXP bar
 function updateEXPBar() {
 	var exp =  $("#exp");
-	expPercent = Math.floor(curEXP * 100 / nextEXP);
 	$(exp).html(String(nextEXP-curEXP));
-	if(expPercent > 100){
+	if(EXPPercent > 100){
 		$(exp).parent().css("width","100%");
 	} else {
-		$(exp).parent().css("width",String(expPercent) + "%");
+		$(exp).parent().css("width",String(EXPPercent) + "%");
 	}
 }
 
 //sets the curEXP and nextEXP variables and updates the bar (slight modification to yours).
-function exp(actionData) {
-	// altered this
+var wm_exp = window.exp;
+window.exp = function(actionData){
+	wm_exp(actionData);
 	curEXP = actionData.Exp;
 	nextEXP = actionData.TotalExpForNextLevel;
+	EXPPercent = Math.floor(curEXP * 100 / nextEXP);
 	updateEXPBar();
-	var extraExpNeeded = nextEXP - curEXP;
-	if (extraExpNeeded < 0) {
-		extraExpNeeded = 0;
-	}
-	var text = buildSpan(cga_dark_green, "Exp: ") + buildSpan(cga_dark_cyan, String(actionData.Exp)) + buildSpan(cga_dark_green, " Level: ") + buildSpan(cga_dark_cyan, String(actionData.Level)) + buildSpan(cga_dark_green, " Exp needed for next level: ") + buildSpan(cga_dark_cyan, String(extraExpNeeded) + " (" + String(actionData.TotalExpForNextLevel) + ") [" + expPercent + "%]") + "<br>";
-	addMessageRaw(text, false, true);
 }
 
 //added addition to get experience. update the expbar and add the exp earned to curEXP
@@ -110,14 +112,14 @@ window.gainExperience = function(actionData) {
 	updateEXPBar();
 }
 
-function mobDropMoney(actionData) {
-	var text = '';
-	for (var k = 0; k < actionData.DroppedCoinRolls.length; k++) {
-		text += buildSpan(cga_light_grayHex, String(actionData.DroppedCoinRolls[k].NumberCoins) + " " + (actionData.DroppedCoinRolls[k].NumberCoins > 1 ? pluralCoinName(actionData.DroppedCoinRolls[k].CoinTypeID) + " drop" : singleCoinName(actionData.DroppedCoinRolls[k].CoinTypeID) + " drops") + " to the ground.") + "<br>";
-		console.log(String(actionData.DroppedCoinRolls[k].NumberCoins) + " + " + String(actionData.DroppedCoinRolls[k].CoinTypeID + pluralCoinName(actionData.DroppedCoinRolls[k].CoinTypeID)) );
-	}
-	addMessageRaw(text, false, true);
-
+//function mobDropMoney(actionData) {
+//	var text = '';
+//	for (var k = 0; k < actionData.DroppedCoinRolls.length; k++) {
+//		text += buildSpan(cga_light_grayHex, String(actionData.DroppedCoinRolls[k].NumberCoins) + " " + (actionData.DroppedCoinRolls[k].NumberCoins > 1 ? pluralCoinName(actionData.DroppedCoinRolls[k].CoinTypeID) + " drop" : singleCoinName(actionData.DroppedCoinRolls[k].CoinTypeID) + " drops") + " to the ground.") + "<br>";
+//		console.log(String(actionData.DroppedCoinRolls[k].NumberCoins) + " + " + String(actionData.DroppedCoinRolls[k].CoinTypeID + pluralCoinName(actionData.DroppedCoinRolls[k].CoinTypeID)) );
+//	}
+//	addMessageRaw(text, false, true);
+//
 //	case 1:
 //	return "copper farthings";
 //	case 2:
@@ -128,19 +130,19 @@ function mobDropMoney(actionData) {
 //	return "platinum pieces";
 //	case 5:
 //	return "runic coins";
-}
+//}
 
 //TODO: update so click on name = telepath to person
-function refreshPlayerList() {
-	hub.server.getPlayersInRealm().done(function (result) {
-
-		var items = [];
-		$.each(result, function (id, name) {
-			items.push('<li class="list-group-item">' + name + '</li>');
-		});
-		$('#listPlayers').html(items.join(''));
-	});
-}
+//function refreshPlayerList() {
+//	hub.server.getPlayersInRealm().done(function (result) {
+//
+//		var items = [];
+//		$.each(result, function (id, name) {
+//			items.push('<li class="list-group-item">' + name + '</li>');
+//		});
+//		$('#listPlayers').html(items.join(''));
+//	});
+//}
 
 //makes the direction buttons work
 function MoveClick(moveValue){
@@ -397,7 +399,7 @@ function ResetExpPH(){
 //stores the exp details
 var curEXP = 0;
 var nextEXP = 0;
-var expPercent = 0;
+var EXPPercent = 100;
 var hpPercent = 100;
 var maPercent = 100;
 
@@ -410,9 +412,12 @@ var time = 0;
 var elapsed = '0.0';
 
 //room items
-var items = "";
+var roomItems = {};
 
-//not sure if needed anymore
+//get items
+var desired = [];
+
+//for playerName
 var playerName = "";
 
 //brings stats into a separate window
@@ -436,7 +441,7 @@ var healInterval;
 var minorHeal = false;
 var majorHeal = false;
 
-// buffing
+//buffing
 var buff = undefined;
 var buffInterval = 3000;
 var buffSelfSpell = "";
@@ -496,32 +501,32 @@ function reverseDirection(dir){
 
 
 function listCommand(actionData) {
-    if (actionData.InShop == false) {
-        var text = buildSpan(cga_light_red, "You cannot LIST if you are not in a shop!") + "<br>";
-        addMessageRaw(text, false, true);
-        return;
-    }
-    var text = buildSpan(cga_light_grayHex, "The following items are for sale here:") + "<br><br>";
-    text += buildFormattedSpan(cga_dark_green, "Item", 30, true) + buildFormattedSpan(cga_dark_cyan, "Quantity", 12, true) + buildSpan(cga_dark_cyan, "Price") + "<br>";
-    text += buildSpan(cga_dark_cyan, "------------------------------------------------------") + "<br>";
-    var canUseStatus = '';
-    if (actionData.ItemsForSale && actionData.ItemsForSale.length > 0) {
+	if (actionData.InShop == false) {
+		var text = buildSpan(cga_light_red, "You cannot LIST if you are not in a shop!") + "<br>";
+		addMessageRaw(text, false, true);
+		return;
+	}
+	var text = buildSpan(cga_light_grayHex, "The following items are for sale here:") + "<br><br>";
+	text += buildFormattedSpan(cga_dark_green, "Item", 30, true) + buildFormattedSpan(cga_dark_cyan, "Quantity", 12, true) + buildSpan(cga_dark_cyan, "Price") + "<br>";
+	text += buildSpan(cga_dark_cyan, "------------------------------------------------------") + "<br>";
+	var canUseStatus = '';
+	if (actionData.ItemsForSale && actionData.ItemsForSale.length > 0) {
 
-        for (var i = 0; i < actionData.ItemsForSale.length; i++) {
-            switch (actionData.ItemsForSale[i].CanUseStatus) {
-                case 2: //can't use
-                    canUseStatus = ' (You can\'t use)';
-                    break;
-                case 3: //too powerful
-                    canUseStatus = ' (Too powerful)';
-                    break;
-                default:
-                case 1: //can use
-                    canUseStatus = '';
-                    break;
+		for (var i = 0; i < actionData.ItemsForSale.length; i++) {
+			switch (actionData.ItemsForSale[i].CanUseStatus) {
+			case 2: //can't use
+				canUseStatus = ' (You can\'t use)';
+				break;
+			case 3: //too powerful
+				canUseStatus = ' (Too powerful)';
+				break;
+			default:
+			case 1: //can use
+				canUseStatus = '';
+				break;
 
-            }
-            if (actionData.ItemsForSale[i].Price % 1000000 === 0 && actionData.ItemsForSale[i].Price != 0){
+			}
+			if (actionData.ItemsForSale[i].Price % 1000000 === 0 && actionData.ItemsForSale[i].Price != 0){
 				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price / 1000000) + " ", 10, false) + buildSpan(cga_dark_cyan, "runic coins" + canUseStatus) + "<br>";
 			} else if (actionData.ItemsForSale[i].Price % 10000 === 0 && actionData.ItemsForSale[i].Price != 0){
 				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price / 10000) + " ", 10, false) + buildSpan(cga_dark_cyan, "platinum pieces" + canUseStatus) + "<br>";
@@ -532,16 +537,16 @@ function listCommand(actionData) {
 			} else {
 				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price) + " ", 10, false) + buildSpan(cga_dark_cyan, "copper farthings" + canUseStatus) + "<br>";
 			}
-        }
-    }
-    addMessageRaw(text, false, true);
+		}
+	}
+	addMessageRaw(text, false, true);
 }
 
 
 var returnTimer = setInterval(function(){
-var val = $("#message").val();
-sendMessageDirect("");
-$("#message").val(val);
+	var val = $("#message").val();
+	sendMessageDirect("");
+	$("#message").val(val);
 },20000);
 
 function instance()
@@ -623,74 +628,24 @@ var ephID = window.setInterval(instance, 2000);
 //}
 //});
 
-function showRoom(actionData) {
-    var mainText = buildSpan(cga_light_cyan, actionData.Name) + "<br>";
-    mainText +=  "&nbsp;&nbsp;&nbsp;&nbsp;" + buildSpan(cga_light_grayHex, actionData.Description) + "<br>";
-    items = "";
-    if (actionData.VisibleCoinRolls && actionData.VisibleCoinRolls.length > 0) {
-        for (var i = 0; i < actionData.VisibleCoinRolls.length; i++) {
-            if (actionData.VisibleCoinRolls[i].Count > 0) {
-                if (items != "") {
-                    items += ", ";
-                }
-                items += String(actionData.VisibleCoinRolls[i].Count) + " ";
-                if (actionData.VisibleCoinRolls[i].Count > 1) {
-                    items += pluralCoinName(actionData.VisibleCoinRolls[i].CoinTypeID);
-                } else {
-                    items += singleCoinName(actionData.VisibleCoinRolls[i].CoinTypeID);
-                }
-            }
-        }
-    }
-    if (actionData.VisibleItems && actionData.VisibleItems.length > 0) {
+var wm_showRoom = window.showRoom;
 
-        for (var i = 0; i < actionData.VisibleItems.length; i++) {
-            if (items != "") {
-                items += ", ";
-            }
-            items += fixStackName(actionData.VisibleItems[i].Count, actionData.VisibleItems[i].Name);
-        }
+window.showRoom = function(actionData) {
+	wm_showRoom(actionData);
+	
+	if (actionData.VisibleItems && actionData.VisibleItems.length > 0) {
+		for (var i = 0; i < actionData.VisibleItems.length; i++) {
+			roomItems[actionData.VisibleItems[i].Name] = actionData.VisibleItems[i].Count;
+		}
 
-    }
-    if (items != "") {
-        var youNoticeText = "You notice " + items + " here.";
-        mainText += buildSpan(cga_dark_cyan, youNoticeText) + "<br>";
-    }
-    if (actionData.AlsoHerePlayers.length > 0 || actionData.AlsoHereMobs.length > 0) {
-        var alsoHereText = "Also here: ";
-        var first = true;
-        for (var i = 0; i < actionData.AlsoHerePlayers.length; i++) {
-            if (i > 0) {
-                alsoHereText += ", ";
-            }
-            alsoHereText += actionData.AlsoHerePlayers[i].FirstName;
-            first = false;
-        }
-        for (var i = 0; i < actionData.AlsoHereMobs.length; i++) {
-            if (i > 0 || !first) {
-                alsoHereText += ", ";
-            }
-            alsoHereText += actionData.AlsoHereMobs[i].Name;
-        }
-        alsoHereText += ".";
-        mainText += buildSpan(cga_light_magenta, alsoHereText) + "<br>";
-    }
-    var obviousExits = "Obvious exits: ";
-    if (actionData.ObviousExits && actionData.ObviousExits.length > 0) {
-        for (var i = 0; i < actionData.ObviousExits.length; i++) {
-            if (i > 0) {
-                obviousExits += ", ";
-            }
-            obviousExits += actionData.ObviousExits[i];
-        }
-    } else {
-        obviousExits += "None!";
-    }
-    mainText += buildSpan(cga_dark_green, obviousExits) + "<br>";
-    addMessageRaw(mainText, false, true);
+	}
 }
 
+var wm_stat = window.stat;
+
 function stat(actionData) {
+	wm_stat(actionData);
+	
 	var text = buildSpan(cga_dark_green, "Name: ") + buildFormattedSpan(cga_dark_cyan, actionData.Name, 37, true) + buildSpan(cga_dark_green, "Lives/CP:") + buildFormattedSpan(cga_dark_cyan, String(actionData.Lives) + "/" + String(actionData.CP), 9, false) + "<br>";
 	text += buildSpan(cga_dark_green, "Race: ") + buildFormattedSpan(cga_dark_cyan, actionData.Race, 16, true) + buildSpan(cga_dark_green, "Exp: ") + buildFormattedSpan(cga_dark_cyan, String(actionData.Exp), 16, true) + buildSpan(cga_dark_green, "Perception:") + buildFormattedSpan(cga_dark_cyan, String(actionData.Perception), 7, false) + "<br>";
 	text += buildSpan(cga_dark_green, "Class: ") + buildFormattedSpan(cga_dark_cyan, actionData.Class, 15, true) + buildSpan(cga_dark_green, "Level: ") + buildFormattedSpan(cga_dark_cyan, String(actionData.Level), 14, true) + buildSpan(cga_dark_green, "Stealth:") + buildFormattedSpan(cga_dark_cyan, String(actionData.Stealth), 10, false) + "<br>";
@@ -706,7 +661,6 @@ function stat(actionData) {
 	text += buildSpan(cga_dark_green, "Strength:") + "&nbsp;&nbsp;" + buildFormattedSpan(cga_dark_cyan, String(actionData.Strength), 9, true) + buildSpan(cga_dark_green, "Agility: ") + buildFormattedSpan(cga_dark_cyan, String(actionData.Agility), 14, true) + buildSpan(cga_dark_green, "Tracking:") + buildFormattedSpan(cga_dark_cyan, String(actionData.Tracking), 9, false) + "<br>";
 	text += buildSpan(cga_dark_green, "Intellect: ") + buildFormattedSpan(cga_dark_cyan, String(actionData.Intellect), 9, true) + buildSpan(cga_dark_green, "Health:") + "&nbsp;&nbsp;" + buildFormattedSpan(cga_dark_cyan, String(actionData.Health), 14, true) + buildSpan(cga_dark_green, "Martial Arts:") + buildFormattedSpan(cga_dark_cyan, String(actionData.MartialArts), 5, false) + "<br>";
 	text += buildSpan(cga_dark_green, "Willpower: ") + buildFormattedSpan(cga_dark_cyan, String(actionData.Willpower), 9, true) + buildSpan(cga_dark_green, "Charm:") + "&nbsp;&nbsp;&nbsp;" + buildFormattedSpan(cga_dark_cyan, String(actionData.Charm), 14, true) + buildSpan(cga_dark_green, "MagicRes:") + buildFormattedSpan(cga_dark_cyan, String(actionData.MagicRes), 9, false) + "<br>";
-	addMessageRaw(text, false, true);
 	statHTML = text;
 }
 
@@ -1055,6 +1009,10 @@ function RunToFordCrossingFromCenterOfSouthport(){
 	sendMessageDirect("EnableAI");
 }
 
+function setDesiredItems(items){
+	desired = items;
+}
+
 function UpdateRunRestDir() {
 	var UnformattedDirection = ($("#RunDirection").val()); //Grabs Textbox Contents.
 
@@ -1078,6 +1036,20 @@ function UpdateRunRestDir() {
 	preRestCommand === "" ? "" : $("#mainScreen").append("<span style='color: cyan'>You will : </span><span style='color: yellow'>" + preRestCommand + "</span>" + "<span style='color: cyan'> before resting.</span><br />");
 	postRestCommand === "" ? "" : $("#mainScreen").append("<span style='color: cyan'>You will : </span><span style='color: yellow'>" + postRestCommand + "</span>" + "<span style='color: cyan'> after resting.</span><br />");
 	sendMessageDirect("");
+}
+
+function setRestMinMax(min,max){
+	$('#RestMax').val(max);
+	$('#RestMin').val(min);
+}
+
+function setRunDir(dir){
+	$("#RunDirection").val(dir);
+}
+
+function setPrePostRest(pre,post){
+	$("#preRestCommand").val(pre);
+	$("#postRestCommand").val(post);
 }
 
 function UpdateHealBuffValues(){
@@ -1107,6 +1079,21 @@ function UpdateHealBuffValues(){
 	minorHealSelfSpell === "" ? "" : $("#mainScreen").append("<span style='color: cyan'>You will now cast <span style='color:yellow;'>" + minorHealSelfSpell + "</span> if below: </span><span style='color: red'>" + minorHealBelowPercent + "% " + "<span style='color: cyan'>of your total HP.</span><br />");
 	majorHealSelfSpell === "" ? "" : $("#mainScreen").append("<span style='color: cyan'>You will now cast <span style='color:yellow;'>" + majorHealSelfSpell + "</span> if below: </span><span style='color: red'>" + majorHealBelowPercent + "% " + "<span style='color: cyan'>of your total HP.</span><br />");
 	sendMessageDirect("");
+}
+
+function setBuff(interval,spell){
+	$("#buffSelfSpell").val(spell);
+	$("#buffInterval").val(interval);
+}
+
+function setMinorHeal(percent,spell){
+	$("#minorHealSpell").val(spell);
+	$("#minorHealBelow").val(percent);
+}
+
+function setMajorHeal(percent,spell){
+	$("#majorHealSpell").val(spell);
+	$("#majorHealBelow").val(percent);
 }
 
 function FixRestPercent(){
@@ -1156,7 +1143,7 @@ function ConfigureUI(){
 	$('#message').parent().remove();
 	$("#divMainPanel").html($("#divMainPanel").children())
 	$('#chkEnableAI').remove();
-	
+
 
 //	add the new stuff
 	$('<div id="divControls" class="panel col-xs-6 col-sm-6 col-md-3 col-lg-3" style="float:left; height:32em; width:21em;"><div style="width:100%"><span>Enable AI: <input type="checkbox" id="chkEnableAI" value="Enable AI"> | </span><span>Enable Scripting: <input type="checkbox" id="EnableScripting" onclick="ScriptingToggle()"></span></div><div style="float:left;width:100%" class="input-group-sm"><input type="text" class="form-control" style="width:100%;max-width:750px;display:inline-block" id="message" autocomplete="false" autocorrect="false"><input type="button" class="btn" style="width:80px;height:30px;padding:0;" id="sendmessage" value="Send"></div><div id="commandBtns" style="width:100%; padding:1em 0 0 0; float:left;"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="conversationsBtn" value="Conversations" onclick="openConvo()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="statsBtn" value="Stats" onclick="statsWindowOpen()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="mapButton" value="Map" onclick="openMapScreen()"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="expButton" value="Reset Exp/h" onclick="ResetExpPH()"><input type="button" value="Tools" id="tools" style="width:5em; height:2em; padding:0;" class="btn" onclick="ToolsButton()"></div></div><div id="progressMonitors" style="float:left; width:21em;"><div style="float:left; width:100%; padding:0 0 0 1em;"><label id="ExpPerHour">0 Exp/h | Approx. Infinity hours to level</label></div><div id="hpContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">HP:</div><div class="progress" style="width:90%"><div class="progress-bar" style="width: 100%; background-color: rgb(230, 46, 0);"><span id="hp">151 / 151</span></div></div></div><div id="maContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">MA:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width:100%; background-color:#3366ff;"><span id="ma">3 / 3</span></div></div></div><div id="expContainer" style="width:100%;float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">EXP:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width: 83%; background-color: rgb(0, 179, 0);"><span id="exp">0</span></div></div></div></div>').insertAfter("#mainScreen");
@@ -1544,8 +1531,8 @@ function ConfigureUI(){
 		}
 	});
 
-//	executes the refresh every half second
-	var tid = setInterval(RefreshBackScroll,500);
+//	executes the backscroll refresh every second
+	var tid = setInterval(RefreshBackScroll,1000);
 
 //	if you click on the main screen will activate the input box
 	$('#mainScreen').click(function() {
@@ -1619,6 +1606,7 @@ if (window.location.pathname === "/Characters/Conversations"){
 
 		if(firstRun === true){
 			ConfigureUI();
+			ConfigurePlayer();
 			firstRun = false;
 		} else {
 
@@ -1629,88 +1617,15 @@ if (window.location.pathname === "/Characters/Conversations"){
 
 			// type your desired item here and this will pick it up if it's in the room,
 			// will repeat until there are no more of that item.
-			var desired = ["acid gland", "coprolite necklace"];
-			for(var i = 0; i < desired.length; i++){
-				if(items.indexOf(desired[i]) > -1){
-					sendMessageDirect("get " + desired[i]);
-					sendMessageDirect("");
-				}
-			}
-
-//			if(statWindow === true){
-//			for(var i = 0; i < mutations.length; i++){
-//			if(mutations[i].addedNodes.length === 67){
-//			for(var k = 0; k < 67; k++){
-//			if(mutations[i].addedNodes[k].outerHTML != undefined){
-//			statHTML += mutations[i].addedNodes[k].outerHTML;
-//			}
-//			}
-//			}
-//			}
-
-//			if(statHTML != ""){
-//			openStatsWindow();
-//			statWindow = false;
-//			}
-//			}
-
-			// hp check, move and rest
-			// move/rest based on playerName must start with case "name": and end with break; if there is no break; code will fall through to next case!
-//			switch (playerName){
-//			case "Blorgen":
-//			if(hpPercent <= 40){
-//			if(resting == false && count == 1){
-//			var val = $("#message").val();
-//			MoveClick("s");
-//			sendMessageDirect("rest");
-//			$("#message").val(val);
-//			count -= 1;
-//			}
-//			} else if (hpPercent >= 100){
-//			if(count == 0){
-//			var val = $("#message").val();
-//			MoveClick("n");
-//			$("#message").val(val);
-//			count += 1;
-//			}
-//			}
-//			break;
-//			case "Bjorgen":
-//			if(hpPercent <= 40){
-//			if(resting == false && count == 1){
-//			var val = $("#message").val();
-//			MoveClick("s");
-//			sendMessageDirect("rest");
-//			$("#message").val(val);
-//			count -= 1;
-//			}
-//			} else if (hpPercent >= 100){
-//			if(count == 0){
-//			var val = $("#message").val();
-//			MoveClick("n");
-//			$("#message").val(val);
-//			count += 1;
-//			}
-//			}
-//			break;
-//			default:
-//			// if name is not either of the last specified
-//			if(hpPercent <= 40){
-//			if(resting == false && count == 1){
-//			var val = $("#message").val();
-//			MoveClick("s");
-//			sendMessageDirect("rest");
-//			$("#message").val(val);
-//			count -= 1;
-//			}
-//			} else if (hpPercent >= 100){
-//			if(count == 0){
-//			var val = $("#message").val();
-//			MoveClick("n");
-//			$("#message").val(val);
-//			count += 1;
-//			}
-//			}
+//			if(roomItems.length != 0){
+//				for(var i = 0; i < desired.length; i++){
+//					if(roomItems[desired[i]]){
+//						for(var k = 0; k < roomItems[desired[i]]; k++) {
+//							sendMessageText("get " + desired[i]);
+//						}
+//						sendMessageDirect("");
+//					}
+//				}
 //			}
 
 			// healing logic - currently working on
@@ -1785,6 +1700,50 @@ if (window.location.pathname === "/Characters/Conversations"){
 	observer.observe($("#mainScreen")[0],options);
 	options = {"attributes":true};
 	observer.observe($("#hp").parent()[0],options);
-
 }
 
+
+// sets up player/s upon starting game
+function ConfigurePlayer(){
+	switch (playerName){
+	case "Blorgen": {
+		//move & rest: comma separated, start room is fighting room
+		setRunDir("sw,w");
+		setRestMinMax(40,100);
+//		setPrePostRest(pre,post);
+
+		//healing
+		setMinorHeal(90,"mend");
+//		setMajorHeal(percent,spell);
+
+		// buffing
+//		setBuff(interval,spell);
+
+		//items to get
+//		setDesiredItems(["marshlord horn"]);
+
+		break;
+	}
+	case "Bjorgen": {
+		//move & rest: comma separated, start room is fighting room
+		setRunDir("s");
+		setRestMinMax(40,100);
+//		setPrePostRest(pre,post);
+
+		//healing
+		setMinorHeal(80,"mahe");
+//		setMajorHeal(percent,spell);
+
+		// buffing
+//		setBuff(interval,spell);
+		
+		//items to get
+//		setDesiredItems(["coprolite necklace","acid gland"]);
+		
+		break;
+	}
+	}
+
+	UpdateRunRestDir();
+	UpdateHealBuffValues();
+}
