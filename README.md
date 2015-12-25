@@ -6,7 +6,12 @@ Thanks to Cyrix and Chupon for their input to help create this.
 
 ------------------------------------
  * Blorgen's - Alternate UI and Script
- * 
+ *
+ * Version 1.7
+ *
+ * Auto-get Items!! (Working on UI)
+ * fixed bug where Send button didn't send.
+ *
  * Version 1.6
  *
  * changed some overrides so as to not mess with Vitoc's code

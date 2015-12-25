@@ -1,6 +1,10 @@
 /*
  * Blorgen's - Alternate UI and Script
  * 
+ * Version 1.7
+ * 
+ * Auto-get Items!! (Work on UI)
+ * fixed bug where Send button didn't send.
  * 
  * Version 1.6
  * 
@@ -635,9 +639,12 @@ window.showRoom = function(actionData) {
 	
 	if (actionData.VisibleItems && actionData.VisibleItems.length > 0) {
 		for (var i = 0; i < actionData.VisibleItems.length; i++) {
-			roomItems[actionData.VisibleItems[i].Name] = actionData.VisibleItems[i].Count;
+			if(desired.indexOf(actionData.VisibleItems[i].Name) != -1){
+				for(var k = 0; k < actionData.VisibleItems[i].Count; k++){
+					sendMessageText("get " + actionData.VisibleItems[i].Name);
+				}
+			}
 		}
-
 	}
 }
 
@@ -1010,8 +1017,23 @@ function RunToFordCrossingFromCenterOfSouthport(){
 }
 
 function setDesiredItems(items){
-	desired = items;
+	if(items != ""){
+		items.split(",").forEach(function(item){
+			if(desired.indexOf(item) === -1){
+				desired.push(item);
+			}
+		});
+	}
 }
+
+function removeDesiredItem(item){
+	if (item != ""){
+		if(desired.indexOf(item) > -1){
+			desired.splice(desired.indexOf(item), 1);
+		}
+	}
+}
+
 
 function UpdateRunRestDir() {
 	var UnformattedDirection = ($("#RunDirection").val()); //Grabs Textbox Contents.
@@ -1147,7 +1169,7 @@ function ConfigureUI(){
 
 
 //	add the new stuff
-	$('<div id="divControls" class="panel col-xs-6 col-sm-6 col-md-3 col-lg-3" style="float:left; height:32em; width:21em;"><div style="width:100%"><span>Enable AI: <input type="checkbox" id="chkEnableAI" value="Enable AI"> | </span><span>Enable Scripting: <input type="checkbox" id="EnableScripting" onclick="ScriptingToggle()"></span></div><div style="float:left;width:100%" class="input-group-sm"><input type="text" class="form-control" style="width:100%;max-width:750px;display:inline-block" id="message" autocomplete="false" autocorrect="false"><input type="button" class="btn" style="width:80px;height:30px;padding:0;" id="sendmessage" value="Send"></div><div id="commandBtns" style="width:100%; padding:1em 0 0 0; float:left;"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="conversationsBtn" value="Conversations" onclick="openConvo()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="statsBtn" value="Stats" onclick="statsWindowOpen()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="mapButton" value="Map" onclick="openMapScreen()"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="expButton" value="Reset Exp/h" onclick="ResetExpPH()"><input type="button" value="Tools" id="tools" style="width:5em; height:2em; padding:0;" class="btn" onclick="ToolsButton()"></div></div><div id="progressMonitors" style="float:left; width:21em;"><div style="float:left; width:100%; padding:0 0 0 1em;"><label id="ExpPerHour">0 Exp/h | Approx. Infinity hours to level</label></div><div id="hpContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">HP:</div><div class="progress" style="width:90%"><div class="progress-bar" style="width: 100%; background-color: rgb(230, 46, 0);"><span id="hp">151 / 151</span></div></div></div><div id="maContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">MA:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width:100%; background-color:#3366ff;"><span id="ma">3 / 3</span></div></div></div><div id="expContainer" style="width:100%;float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">EXP:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width: 83%; background-color: rgb(0, 179, 0);"><span id="exp">0</span></div></div></div></div>').insertAfter("#mainScreen");
+	$('<div id="divControls" class="panel col-xs-6 col-sm-6 col-md-3 col-lg-3" style="float:left; height:32em; width:21em;"><div style="width:100%"><span>Enable AI: <input type="checkbox" id="chkEnableAI" value="Enable AI"> | </span><span>Enable Scripting: <input type="checkbox" id="EnableScripting" onclick="ScriptingToggle()"></span></div><div style="float:left;width:100%" class="input-group-sm"><input type="text" class="form-control" style="width:100%;max-width:750px;display:inline-block" id="message" autocomplete="false" autocorrect="false"><input type="button" class="btn" style="width:80px;height:30px;padding:0;" id="sendmessage" value="Send" onclick="sendMessage();"></div><div id="commandBtns" style="width:100%; padding:1em 0 0 0; float:left;"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="conversationsBtn" value="Conversations" onclick="openConvo()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="statsBtn" value="Stats" onclick="statsWindowOpen()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="mapButton" value="Map" onclick="openMapScreen()"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="expButton" value="Reset Exp/h" onclick="ResetExpPH()"><input type="button" value="Tools" id="tools" style="width:5em; height:2em; padding:0;" class="btn" onclick="ToolsButton()"></div></div><div id="progressMonitors" style="float:left; width:21em;"><div style="float:left; width:100%; padding:0 0 0 1em;"><label id="ExpPerHour">0 Exp/h | Approx. Infinity hours to level</label></div><div id="hpContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">HP:</div><div class="progress" style="width:90%"><div class="progress-bar" style="width: 100%; background-color: rgb(230, 46, 0);"><span id="hp">151 / 151</span></div></div></div><div id="maContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">MA:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width:100%; background-color:#3366ff;"><span id="ma">3 / 3</span></div></div></div><div id="expContainer" style="width:100%;float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">EXP:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width: 83%; background-color: rgb(0, 179, 0);"><span id="exp">0</span></div></div></div></div>').insertAfter("#mainScreen");
 	$("#commandBtns").prepend('<span id="version" style="width:100%; float:left; font-size:smaller;">Blorgen\'s script v' + version + '</span>')
 
 	$('<div style="width:100%;"> \
@@ -1156,7 +1178,7 @@ function ConfigureUI(){
 			<li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab" style="padding:.2em .2em .2em .2em">Move</a></li> \
 			<li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab" style="padding:.2em .2em .2em .2em">Rest</a></li> \
 			<li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab" style="padding:.2em .2em .2em .2em">Heal/Buff</a></li> \
-			<!-- <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab" style="padding:.2em .2em .2em .2em">Settings</a></li> --> \
+			<li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab" style="padding:.2em .2em .2em .2em">Items</a></li> \
 			</ul> \
 			\
 			<!-- Tab panes --> \
@@ -1166,7 +1188,7 @@ function ConfigureUI(){
 			<div role="tabpanel" class="tab-pane" id="profile"><div id="moveRestHeal" style="float:left; width:100%; padding:1em 0 0 0;"><span>Rest Below: <input type="number" size="1" id="RestMin" value=' + RestMinPercent + ' min="1" max="100" onchange="FixRestPercent()" style="text-align:center; width: 3em;">% HP</span><br><span>Max: <input type="number" size="1" id="RestMax" value=' + RestMaxPercent + ' min="1" max="100" onchange="FixRestPercent()" style="text-align:center; width: 3em;">% HP</span><span style="margin-left:2em;">Run Dir: <input type="text" size="7" id="RunDirection" value=' + scriptRunDirection +'></span><span style="display:block;">Pre Rest: <input type="text" id="preRestCommand" value=' + preRestCommand +'></span><span style="display:block;">Post Rest: <input type="text" id="postRestCommand" value=' + postRestCommand +'></span><span><input type="submit" value="UPDATE" onclick="UpdateRunRestDir()" class="btn" style="height:2em; padding:0;"></span></div> \
 			</div> \
 			<div role="tabpanel" class="tab-pane" id="messages"><div id="HealBuff" style="float:left; width:100%; padding:1em 0 0 0;"><span style="display:block; ">Minor Heal Below: <input type="text" id="minorHealBelow" value="' + minorHealBelowPercent + '" style="width:3em;"></input>% HP</span><span style="display:block;">Minor Heal Self Spell: <input type="text" id="minorHealSpell" value="' + minorHealSelfSpell + '" style="width:5em;"></input></span><span style="display:block; ">Major Heal Below: <input type="text" id="majorHealBelow" value="' + majorHealBelowPercent + '" style="width:3em;"></input>% HP</span><span style="display:block; ">Major Heal Self Spell: <input type="text" id="majorHealSpell" value="' + majorHealSelfSpell + '" style="width:5em;"></input></span><span style="display:block; ">Buff spell: <input type="text" id="buffSelfSpell" value="' + buffSelfSpell + '" style="width:5em;"></input></span><span style="display:block; ">Buff interval (msecs): <input type="text" id="buffInterval" value="' + buffInterval + '" style="width:5em;"></input></span></div><span><input type="submit" value="UPDATE" onclick="UpdateHealBuffValues()" class="btn" style="height:2em; padding:0;"></span></div> \
-			<div role="tabpanel" class="tab-pane" id="settings">...</div> \
+			<div role="tabpanel" class="tab-pane" id="settings"><div id="Items" style="float:left; width:100%; padding:1em 0 0 0;"> </div><div><input type="text" id="addItem" /><input type="button" onclick="setDesiredItems($(&quot;#addItem&quot;).val()); $(&quot;#addItem&quot;).val(&quot;&quot;)" value="Add" /></div></div> \
 			</div> \
 			\
 	</div>').insertAfter("#commandBtns");
@@ -1709,7 +1731,7 @@ function ConfigurePlayer(){
 	switch (playerName){
 	case "Blorgen": {
 		//move & rest: comma separated, start room is fighting room
-		setRunDir("sw,w");
+		setRunDir("s");
 		setRestMinMax(40,100);
 //		setPrePostRest(pre,post);
 
@@ -1721,7 +1743,7 @@ function ConfigurePlayer(){
 //		setBuff(interval,spell);
 
 		//items to get
-//		setDesiredItems(["marshlord horn"]);
+		setDesiredItems("ornate falchion,bone dust");
 
 		break;
 	}
@@ -1736,10 +1758,10 @@ function ConfigurePlayer(){
 //		setMajorHeal(percent,spell);
 
 		// buffing
-//		setBuff(interval,spell);
+		setBuff(240000,"hshi");
 		
 		//items to get
-//		setDesiredItems(["coprolite necklace","acid gland"]);
+		setDesiredItems("bone dust,ornate falchion");
 		
 		break;
 	}
