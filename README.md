@@ -10,7 +10,7 @@ Thanks to Cyrix and Chupon for their input to help create this.
  * Version 1.6
  *
  * changed some overrides so as to not mess with Vitoc's code
- * configure player at end of code; including get items
+ * configure player at end of code;
  *
  * Version 1.5
  * 

@@ -5,7 +5,7 @@
  * Version 1.6
  * 
  * changed some overrides so as to not mess with Vitoc's code
- * configure player at end of code; including get items
+ * configure player at end of code;
  * 
  * 
  * Version 1.5
@@ -530,8 +530,8 @@ function listCommand(actionData) {
 				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price / 1000000) + " ", 10, false) + buildSpan(cga_dark_cyan, "runic coins" + canUseStatus) + "<br>";
 			} else if (actionData.ItemsForSale[i].Price % 10000 === 0 && actionData.ItemsForSale[i].Price != 0){
 				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price / 10000) + " ", 10, false) + buildSpan(cga_dark_cyan, "platinum pieces" + canUseStatus) + "<br>";
-			} else if (actionData.ItemsForSale[i].Price % 1000 === 0 && actionData.ItemsForSale[i].Price != 0) {
-				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price / 1000) + " ", 10, false) + buildSpan(cga_dark_cyan, "gold crowns" + canUseStatus) + "<br>";
+			} else if (actionData.ItemsForSale[i].Price % 100 === 0 && actionData.ItemsForSale[i].Price != 0) {
+				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price / 100) + " ", 10, false) + buildSpan(cga_dark_cyan, "gold crowns" + canUseStatus) + "<br>";
 			} else if(actionData.ItemsForSale[i].Price % 10 === 0 && actionData.ItemsForSale[i].Price != 0) {
 				text += buildFormattedSpan(cga_dark_green, actionData.ItemsForSale[i].ItemTypeName + " ", 30, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Count) + " ", 5, true) + buildFormattedSpan(cga_dark_cyan, String(actionData.ItemsForSale[i].Price / 10) + " ", 10, false) + buildSpan(cga_dark_cyan, "silver nobles" + canUseStatus) + "<br>";
 			} else {
@@ -643,7 +643,7 @@ window.showRoom = function(actionData) {
 
 var wm_stat = window.stat;
 
-function stat(actionData) {
+window.stat = function(actionData) {
 	wm_stat(actionData);
 	
 	var text = buildSpan(cga_dark_green, "Name: ") + buildFormattedSpan(cga_dark_cyan, actionData.Name, 37, true) + buildSpan(cga_dark_green, "Lives/CP:") + buildFormattedSpan(cga_dark_cyan, String(actionData.Lives) + "/" + String(actionData.CP), 9, false) + "<br>";
@@ -1078,6 +1078,7 @@ function UpdateHealBuffValues(){
 
 	minorHealSelfSpell === "" ? "" : $("#mainScreen").append("<span style='color: cyan'>You will now cast <span style='color:yellow;'>" + minorHealSelfSpell + "</span> if below: </span><span style='color: red'>" + minorHealBelowPercent + "% " + "<span style='color: cyan'>of your total HP.</span><br />");
 	majorHealSelfSpell === "" ? "" : $("#mainScreen").append("<span style='color: cyan'>You will now cast <span style='color:yellow;'>" + majorHealSelfSpell + "</span> if below: </span><span style='color: red'>" + majorHealBelowPercent + "% " + "<span style='color: cyan'>of your total HP.</span><br />");
+	buffSelfSpell === "" ? "" : $("#mainScreen").append("<span style='color: cyan'>You will now cast <span style='color:yellow;'>" + buffSelfSpell + "</span> every: </span><span style='color: red'>" + buffInterval/1000 + "<span style='color: cyan'> seconds.</span><br />");
 	sendMessageDirect("");
 }
 
