@@ -7,6 +7,25 @@ Thanks to Cyrix and Chupon for their input to help create this.
 ------------------------------------
  * Blorgen's - Alternate UI and Script
  *
+ * Version 1.8
+ * 
+ * Auto-get items, add exact item name in ui and click on item to remove 
+ * rework paths script - bit easier to add things to. Need to work on #menu display
+ * #set brief command - works with existing show room - leaves a gap but won't break if Vitoc changes anything
+ * My own auto-attack (plain attack only) - Turn AI off - Scripting on  (set by default) - will not get coins
+ * 
+ * 
+ * ***** IN PROGRESS *****
+ * automated mapping / walking / running - maybe - not sure if doable.
+ * auto-set rest directions
+ * UI needs to be able to scroll
+ * 
+ * ***** KNOWN ISSUES ******
+ * Auto-get does not work with coins - if enough of you want to get coins by choice I can work it in
+ * At the moment the UI for get items will not stop, I have not continued adding items upon items. I usually clear what is not relevant to the area.
+ *
+ *
+ *
  * Version 1.7
  *
  * Auto-get Items!! (Working on UI)
