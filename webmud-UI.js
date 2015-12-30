@@ -17,7 +17,7 @@
  * ***** KNOWN ISSUES ******
  * Auto-get does not work with coins - if enough of you want to get coins by choice I can work it in
  * At the moment the UI for get items will not stop, I have not continued adding items upon items. I usually clear what is not relevant to the area.
- * 
+ * #menu does not auto-wrap at mainscreen boundaries (they all appear in the drop-down)
  * 
  * 
  * 
