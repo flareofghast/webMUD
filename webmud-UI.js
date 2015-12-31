@@ -603,78 +603,6 @@ function reverseDirection(dir){
 var wm_inventory = window.inventory;
 window.inventory = function(actionData){
 	wm_inventory(actionData);
-
-	//function inventory(actionData) {
-//	var carryingText = "You are carrying ";
-//	var first = true;
-//	if (actionData.CoinRolls != null && actionData.CoinRolls.length > 0) {
-//	for (var i = 0; i < actionData.CoinRolls.length; i++) {
-//	if (!first) {
-//	carryingText += ", ";
-//	} else {
-//	first = false;
-//	}
-//	carryingText += String(actionData.CoinRolls[i].NumberCoins) + " " + (actionData.CoinRolls[i].NumberCoins > 1 ? pluralCoinName(actionData.CoinRolls[i].CoinTypeID) : singleCoinName(actionData.CoinRolls[i].CoinTypeID))
-//	}
-//	}
-//	var wornItems = new Array();
-//	if (actionData.WornItems && actionData.WornItems.length > 0) {
-//	for (var i = 0; i < actionData.WornItems.length; i++) {
-//	if (first != true) {
-//	carryingText += ", ";
-//	} else {
-//	first = false;
-//	}
-//	carryingText += actionData.WornItems[i].EquippedItemTypeName + " (" + getWornLocationName(actionData.WornItems[i].Location) + ")";
-//	wornItems.push(actionData.WornItems[i].EquippedItemTypeID);
-//	}
-//	}
-//	if (actionData.NonKeyInventory && actionData.NonKeyInventory.length > 0) {
-//	var wornItemIndex;
-//	var fixedCount;
-//	for (var i = 0; i < actionData.NonKeyInventory.length; i++) {
-//	wornItemIndex = wornItems.indexOf(actionData.NonKeyInventory[i].ItemTypeID);
-//	fixedCount = actionData.NonKeyInventory[i].Count;
-//	if (wornItemIndex >= 0) {
-//	wornItems.splice(wornItemIndex, 1);
-//	fixedCount--;
-//	}
-//	if (fixedCount > 0) {
-//	if (first != true) {
-//	carryingText += ", ";
-//	} else {
-//	first = false;
-//	}
-//	carryingText += fixStackName(fixedCount, actionData.NonKeyInventory[i].Name);
-//	}
-//	}
-//	}
-//	if (first == true) {
-//	carryingText += "nothing";
-//	}
-
-//	var keyText = "You have ";
-//	if (actionData.KeyInventory && actionData.KeyInventory.Length > 0) {
-//	keyText += "the following keys: ";
-//	for (var i = 0; i < actionData.KeyInventory.length; i++) {
-//	if (i > 0) {
-//	keyText += ", ";
-//	}
-//	keyText += fixStackName(actionData.KeyInventory[i].Count, actionData.KeyInventory[i].Name);
-//	}
-//	} else {
-//	keyText += "no keys";
-//	}
-//	keyText += ".";
-//	var finalText = buildSpan(cga_light_grayHex, carryingText) + "<br>";
-//	finalText += buildSpan(cga_light_grayHex, keyText) + "<br>";
-//	finalText += buildSpan(cga_dark_green, "Wealth: ") + buildSpan(cga_dark_cyan, String(actionData.TotalWealth) + " copper farthings") + "<br>";
-//	var encPercent = actionData.CurEncum * 100 / actionData.MaxEncum;
-
-//	finalText += buildSpan(cga_dark_green, "Encumbrance: ") + buildSpan(cga_dark_cyan, String(actionData.CurEncum) + "/" + String(actionData.MaxEncum) + " - ") + buildSpan(getEncLevelColor(encPercent), getEncLevelName(encPercent)) + buildSpan(cga_light_grayHex, " [" + String(Math.round(encPercent)) + "%]") + "<br>";
-//	addMessageRaw(finalText, false, true);
-//	}
-
 }
 
 var wm_spells = window.spells;
@@ -1452,6 +1380,66 @@ Paths['sivwarchief2ford'] = {
 		}
 }
 
+Paths['stonewood2harpy'] = {
+		restRunDir : "",
+		steps : "sw,sw,s,se,e,se,e,se,se,se,e,se,e,ne,e,ne,e,se,u,se,s,s,nw,n",
+		run : function(){
+			this.steps.split(",").forEach(function(dir){
+				MoveClick(dir);
+			})
+		}
+}
+
+Paths['harpy2stonewood'] = {
+		restRunDir : "",
+		steps : Paths['stonewood2harpy'].steps.split(",").reverse().toString(),
+		run : function(){
+			this.steps.split(",").forEach(function(dir){
+				MoveClick(reverseDirection(dir));
+			})
+		}
+}
+
+Paths['stonewood2gnarledancient'] = {
+		restRunDir : "",
+		steps : "sw,sw,s,se,e,s,sw,s,sw,s,se,d,s,sw,w,sw,w,sw,s,sw,w,sw,s,sw,se,e,ne",
+		run : function(){
+			this.steps.split(",").forEach(function(dir){
+				MoveClick(dir);
+			})
+		}
+}
+
+Paths['gnarledancient2stonewood'] = {
+		restrunDir : "",
+		steps : Paths['stonewood2gnarledancient'].steps.split(",").reverse().toString(),
+		run : function(){
+			this.steps.split(",").forEach(function(dir){
+				MoveClick(reverseDirection(dir));
+			})
+		}
+}
+
+Paths['southporttrainer2deepwoodtrainer'] = {
+		restRunDir : "",
+		steps : "n,w,w,w,w,s,s,s,s,s,w,w,w,w,w,w,w,w,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,nw,nw,nw,n,w,w,nw,nw,n,n,n,n,ne,n,ne,n,d,nw,n,e,ne,d,ne,ne,n,n,ne,n,ne,n,ne,n,ne,n,ne,ne,n,ne,se,e,ne,se,se,e,ne,e,ne,e,se,ne,e,ne,n,e,n,ne,ne,nw,nw,nw,n,n,n,n,nw,n,n,nw,n,n,n,nw,n,ne,n,ne,ne,n,n,ne,n,n,nw,w,nw,n,ne,n,n,n,n,ne,ne,n,n,ne,ne,n,n,n,ne,n,ne,n,n,n,n,nw,n,nw,nw,n,n,n,ne,n,n,ne,n,w,w,nw,w,sw,w,sw,s,se,sw,w,sw,sw,nw,w,sw,w,sw,w,w,sw,sw,sw,se,s,sw,s,sw,ne,n,ne,n,nw,w,w,nw,w,sw,sw,sw,s",
+		run : function(){
+			this.steps.split(",").forEach(function(dir){
+				MoveClick(dir);
+			})
+		}
+}
+
+Paths['deepwoodtrainer2southporttrainer'] = {
+		restRunDir : "",
+		steps : Paths['southporttrainer2deepwoodtrainer'].steps.split(",").reverse().toString(),
+		run : function(){
+			this.steps.split(",").forEach(function(dir){
+				MoveClick(reverseDirection(dir));
+			})
+		}
+}
+
 function setDesiredItems(items){
 	if(items != ""){
 		items.split(",").forEach(function(item){
@@ -1685,102 +1673,10 @@ function ConfigureUI(){
 			$("#message").val("");
 			brief = !brief;
 		}
-
-
-//		case '#stonewood2harpy':
-
-//		$('#message').val(""); //This clears the text box after your command is recognized.
-
-////		$("#chkEnableAI").click();
-
-//		var stonewood2harpy = "sw,sw,s,se,e,se,e,se,se,se,e,se,e,ne,e,ne,e,se,u,se,s,s,nw,n";
-//		stonewood2harpy.split(",").forEach(function(dir){
-//		MoveClick(dir);
-//		});
-
-////		$("#chkEnableAI").click();
-
-
-//		break;
-
-//		case '#harpy2stonewood':
-
-//		$('#message').val(""); //This clears the text box after your command is recognized.
-
-////		$("#chkEnableAI").click();
-
-//		var stonewood2harpy = "sw,sw,s,se,e,se,e,se,se,se,e,se,e,ne,e,ne,e,se,u,se,s,s,nw,n";
-//		stonewood2harpy.split(",").reverse().forEach(function(dir){
-//		MoveClick(reverseDirection(dir));
-//		});
-
-////		$("#chkEnableAI").click();
-
-//		break;
-//		case '#gnarledancient2stonewood':
-//		$('#message').val(""); //This clears the text box after your command is recognized.
-
-////		$("#chkEnableAI").click();
-
-//		var stonewood2gnarledancient = "sw,sw,s,se,e,s,sw,s,sw,s,se,d,s,sw,w,sw,w,sw,s,sw,w,sw,s,sw,se,e,ne";
-//		stonewood2gnarledancient.split(",").reverse().forEach(function(dir){
-//		MoveClick(reverseDirection(dir));
-//		});
-
-////		$("#chkEnableAI").click();
-
-//		break;
-//		case '#stonewood2gnarledancient':
-//		$('#message').val(""); //This clears the text box after your command is recognized.
-
-////		$("#chkEnableAI").click();
-
-//		var stonewood2gnarledancient = "sw,sw,s,se,e,s,sw,s,sw,s,se,d,s,sw,w,sw,w,sw,s,sw,w,sw,s,sw,se,e,ne";
-//		stonewood2gnarledancient.split(",").forEach(function(dir){
-//		MoveClick(dir);
-//		});
-
-////		$("#chkEnableAI").click();
-//		break;
-//		case '#deepwoodtrainer2southporttrainer': //Start this from the starting town trainer room FULL RUN TO SouthportTrainer
-
-//		$('#message').val(""); //This clears the text box after your command is recognized.
-
-////		$("#chkEnableAI").click();
-
-//		var southporttrainer2deepwoodtrainer = "n,w,w,w,w,s,s,s,s,s,w,w,w,w,w,w,w,w,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,nw,nw,nw,n,w,w,nw,nw,n,n,n,n,ne,n,ne,n,d,nw,n,e,ne,d,ne,ne,n,n,ne,n,ne,n,ne,n,ne,n,ne,ne,n,ne,se,e,ne,se,se,e,ne,e,ne,e,se,ne,e,ne,n,e,n,ne,ne,nw,nw,nw,n,n,n,n,nw,n,n,nw,n,n,n,nw,n,ne,n,ne,ne,n,n,ne,n,n,nw,w,nw,n,ne,n,n,n,n,ne,ne,n,n,ne,ne,n,n,n,ne,n,ne,n,n,n,n,nw,n,nw,nw,n,n,n,ne,n,n,ne,n,w,w,nw,w,sw,w,sw,s,se,sw,w,sw,sw,nw,w,sw,w,sw,w,w,sw,sw,sw,se,s,sw,s,sw,ne,n,ne,n,nw,w,w,nw,w,sw,sw,sw,s";
-//		southporttrainer2deepwoodtrainer.split(",").reverse().forEach(function(dir){
-//		MoveClick(reverseDirection(dir));
-//		});
-
-////		$("#chkEnableAI").click();
-
-//		break;
-
-//		case '#southporttrainer2deepwoodtrainer': //Start this from the Southport trainer. LONG RUN
-
-//		$('#message').val(""); //This clears the text box after your command is recognized.
-
-////		$("#chkEnableAI").click();
-
-//		var southporttrainer2deepwoodtrainer = "n,w,w,w,w,s,s,s,s,s,w,w,w,w,w,w,w,w,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,nw,nw,nw,n,w,w,nw,nw,n,n,n,n,ne,n,ne,n,d,nw,n,e,ne,d,ne,ne,n,n,ne,n,ne,n,ne,n,ne,n,ne,ne,n,ne,se,e,ne,se,se,e,ne,e,ne,e,se,ne,e,ne,n,e,n,ne,ne,nw,nw,nw,n,n,n,n,nw,n,n,nw,n,n,n,nw,n,ne,n,ne,ne,n,n,ne,n,n,nw,w,nw,n,ne,n,n,n,n,ne,ne,n,n,ne,ne,n,n,n,ne,n,ne,n,n,n,n,nw,n,nw,nw,n,n,n,ne,n,n,ne,n,w,w,nw,w,sw,w,sw,s,se,sw,w,sw,sw,nw,w,sw,w,sw,w,w,sw,sw,sw,se,s,sw,s,sw,ne,n,ne,n,nw,w,w,nw,w,sw,sw,sw,s";
-//		southporttrainer2deepwoodtrainer.split(",").forEach(function(dir){
-//		MoveClick(dir);
-//		});
-
-////		$("#chkEnableAI").click();
-
-//		break;
-
 	});
-
 
 	//DROP DOWN PATHS
 	var select = document.getElementById("PathDropDown");
-//	var PathArray=["#ResetExpMeter", "#Ford2Southport", "#Southport2Ford", "#DeepwoodTrainer2SouthportTrainer", "#SouthportTrainer2DeepwoodTrainer",
-//	"#Trainer2Graveyard", "#Graveyard2Trainer", "#Trainer2Smithy", "#Smithy2Trainer", "#Trainer2Pit", "#Pit2Trainer", "#Tangle2Trainer",
-//	"#Trainer2Tangle", "#Dryad2Trainer","#Trainer2Dryad", "#Ford2SouthTrainer", "#SouthTrainer2Ford", "#Graveyard2Ford", "#Ford2Graveyard", "#SivRaiderLair2Ford",
-//	"#Ford2SivRaiderLair", "#Dice"];
 
 	for(var i = 0; i < thePaths.length; i++) {
 		var opt = thePaths[i];
@@ -1999,7 +1895,7 @@ function ConfigurePlayer(){
 		//move & rest: comma separated, start room is fighting room
 		setRunDir("e");
 		setRestMinMax(40,100);
-//		setPrePostRest(pre,post);
+		setPrePostRest("wear marshwood","wear serpent");
 
 		//healing
 		setMinorHeal(80,"mahe");
@@ -2016,6 +1912,7 @@ function ConfigurePlayer(){
 	case "Charma": {
 		setRunDir("d");
 		setRestMinMax(40,97);
+		setPrePostRest("wear coprolite","wear polished onyx")
 		break;
 	}
 	}
