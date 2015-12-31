@@ -112,10 +112,12 @@ var restBelowMAPercent = 30;
 var restMaxMAPercent = 100;
 var preRestCommand = "";
 var postRestCommand = "";
+var shouldSetRunDir = false;
+var running = false;
 
 //healing
 var minorHealBelowPercent = 80;
-var minorHealSelfSpell = "mend";
+var minorHealSelfSpell = "";
 var majorHealBelowPercent = 50;
 var majorHealSelfSpell = "";
 var healManaAbove = 50;
@@ -514,7 +516,7 @@ window.combatOff = function(){
 var wm_attack = window.attack;
 window.attack = function(actionData){
 	wm_attack(actionData);
-	if (scripting && attacking === false && actionData.Result != -1 && actionData.Result != -2){
+	if (scripting && attacking === false && running === false && actionData.Result != -1 && actionData.Result != -2){
 		attacking = true;
 	} else if(scripting && attacking === true && (actionData.Result === -1 || actionData.Result === -2)){
 		attacking = false;
@@ -524,7 +526,7 @@ window.attack = function(actionData){
 var wm_entersTheRoom = window.entersTheRoom;
 window.entersTheRoom = function(actionData) {
 	wm_entersTheRoom(actionData);
-	if (scripting && attacking === false && actionData.EnteringFigureType != 0)  {
+	if (scripting && attacking === false && running === false && actionData.EnteringFigureType != 0)  {
 		sendMessageDirect("");
 	}    
 }
@@ -899,10 +901,10 @@ window.showRoom = function(actionData) {
 		room.ObviousExits = actionData.ObviousExits;
 	}
 
-	if(scripting && attacking === false && actionData.AlsoHereMobs.length > 0){
+	if(scripting && attacking === false && running === false && actionData.AlsoHereMobs.length > 0){
 		sendMessageText("a " + actionData.AlsoHereMobs[0].Name);
 		attacking = true;
-		addMessageRaw(buildSpan(cga_light_green, "**BLORGEN'S AI ATTACK**") + "<br/ class='hour" + new Date().getHours() +" '>", false, true);
+		addMessageRaw(buildSpan(cga_light_green, "**BLORGEN'S AI ATTACK**") + "<br/>", false, true);
 	} else if(scripting && attacking === true && actionData.AlsoHereMobs.length === 0){
 		attacking = false;
 	}
@@ -972,7 +974,7 @@ function openStatsWindow(){
 
 //Run to places
 Paths["deepwood2brigands"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "ne,ne,ne,e,se,e,e,ne,ne,ne,nw,nw,n,ne,ne,n,nw,n,nw,w,nw,n,ne,n,ne,e,se,ne,nw,ne,e,se,e,se,e,ne,e",
 		run : function() {
 			this.steps.split(",").forEach(function(direction){
@@ -982,7 +984,7 @@ Paths["deepwood2brigands"] = {
 }
 
 Paths["brigands2deepwood"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "w,sw,w,nw,w,nw,w,sw,se,sw,nw,w,sw,s,sw,s,se,e,se,s,se,s,sw,sw,s,se,se,sw,sw,sw,w,w,nw,w,sw,sw,sw",
 		run : function() {
 			this.steps.split(",").forEach(function(direction){
@@ -992,7 +994,7 @@ Paths["brigands2deepwood"] = {
 }
 
 Paths["tanglewwod2deepwood"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "s,se,ne,e,u,e,e,ne,ne,ne,e,ne,e,ne,e,se,e,ne,n,nw,n,ne,ne,ne,n,e,ne,ne,n,ne,ne,e,ne,se,se,e,se,se,sw,sw,sw",
 		run : function() {
 			this.steps.split(",").forEach(function(direction){
@@ -1002,7 +1004,7 @@ Paths["tanglewwod2deepwood"] = {
 }
 
 Paths["deepwood2tanglewood"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "ne,ne,ne,nw,nw,w,nw,nw,sw,w,sw,sw,s,sw,sw,w,s,sw,sw,sw,s,se,s,sw,w,nw,w,sw,w,sw,w,sw,sw,sw,w,w,d",
 		run : function(){
 			this.steps.split(",").forEach(function(direction){
@@ -1012,7 +1014,7 @@ Paths["deepwood2tanglewood"] = {
 }
 
 Paths["wolves2deepwood"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "e,ne,e,se,e,se,s,sw,w,sw,s,sw,se,s,se,s,sw,se,s,sw,se,s,se,se,sw,sw,sw",
 		run : function(){
 			this.steps.split(",").forEach(function (direction){
@@ -1022,7 +1024,7 @@ Paths["wolves2deepwood"] = {
 }
 
 Paths["deepwood2wolves"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "ne,ne,ne,nw,nw,n,nw,ne,n,nw,ne,n,nw,n,nw,ne,n,ne,e,ne,n,nw,w,nw,w,sw,w",
 		run : function(){
 			this.steps.split(",").forEach(function (direction){
@@ -1032,7 +1034,7 @@ Paths["deepwood2wolves"] = {
 }
 
 Paths["verdantbog2deepwood"] = {
-		runRestdir : "",
+		restRunDir : "",
 		steps : "s,se,sw,s,sw,nw,n,n,nw,n,n,nw,n,n,n,nw,n,ne,n,ne,ne,n,n,ne,n,n,nw,w,nw,n,ne,n,n,n,n,ne,n,nw,w,nw,w,nw,w,n,nw,n,nw,n,nw,sw,n,nw,n,nw,ne,n,nw,n,n,n,nw,sw,sw,sw,w,w,nw,w,sw,sw,sw",
 		run : function(){
 			this.steps.split(",").forEach(function(direction){
@@ -1042,7 +1044,7 @@ Paths["verdantbog2deepwood"] = {
 }
 
 Paths["deepwood2verdantbog"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : Paths.verdantbog2deepwood.steps.split(',').reverse().toString(),
 		run: function(){
 			this.steps.split(',').forEach(function(direction){
@@ -1052,7 +1054,7 @@ Paths["deepwood2verdantbog"] = {
 }
 
 Paths["southport2greenmarshes"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "w,w,w,w,w,w,w,w,w,w,w,w,w,w,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,n,nw,nw,nw,n,w,w,nw,nw,n,n,n,n,ne,n,ne,n,d,nw,n,e,ne,d,ne,ne,n,n,ne,n,ne,n,ne,se,e",
 		run : function(){this.steps.split(",").forEach(function(direction){
 			MoveClick(direction);
@@ -1061,7 +1063,7 @@ Paths["southport2greenmarshes"] = {
 }
 
 Paths["greenmarshes2southport"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : Paths.southport2greenmarshes.steps.split(',').reverse().toString(),
 		run : function(){this.steps.split(",").forEach(function(direction){
 			MoveClick(reverseDirection(direction));
@@ -1069,7 +1071,7 @@ Paths["greenmarshes2southport"] = {
 }
 
 Paths["verdantbog2greenmarshes"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "s,se,sw,s,sw,se,se,s,s,sw,sw,s,w,s,sw,w,sw,nw,w,sw,w,sw,w,nw,sw,w,nw,sw,w,nw,sw,s,sw,sw,s,sw,s,se,e",
 		run : function(){
 			this.steps.split(",").forEach(function(direction){
@@ -1078,7 +1080,7 @@ Paths["verdantbog2greenmarshes"] = {
 }
 
 Paths["greenmarshes2verdantbog"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps  : Paths.verdantbog2greenmarshes.steps.split(',').reverse().toString(),
 		run : function(){this.steps.split(",").forEach(function(direction){
 			MoveClick(reverseDirection(direction));
@@ -1086,7 +1088,7 @@ Paths["greenmarshes2verdantbog"] = {
 }
 
 Paths["greenmarshes2sivs"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "se,e,n,e,ne,se,se,sw,s,sw,w,sw,s,w,nw,w,nw,",
 		run : function(){this.steps.split(",").forEach(function(direction){
 			MoveClick(direction);
@@ -1094,7 +1096,7 @@ Paths["greenmarshes2sivs"] = {
 }
 
 Paths["sivs2greenmarshes"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : Paths.greenmarshes2sivs.steps.split(',').reverse().toString(),
 		run : function(){
 			this.steps.split(",").forEach(function(direction){
@@ -1103,7 +1105,7 @@ Paths["sivs2greenmarshes"] = {
 }
 
 Paths["southport2sivs"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "",
 		run : function(){
 			Paths.southport2greenmarshes.run();
@@ -1112,7 +1114,7 @@ Paths["southport2sivs"] = {
 }
 
 Paths["sivs2southport"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "",
 		run : function(){
 			Paths.sivs2greenmarshes.run();
@@ -1121,7 +1123,7 @@ Paths["sivs2southport"] = {
 }
 
 Paths["deepwood2sivs"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "",
 		run : function(){
 			Paths.deepwood2verdantbog.run();
@@ -1131,7 +1133,7 @@ Paths["deepwood2sivs"] = {
 }
 
 Paths["deepwood2southport"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "",
 		run : function(){
 			Paths.deepwood2verdantbog.run();
@@ -1141,7 +1143,7 @@ Paths["deepwood2southport"] = {
 }
 
 Paths["southport2deepwood"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "",
 		run : function(){ 
 			Paths.southport2greenmarshes.run();
@@ -1151,7 +1153,7 @@ Paths["southport2deepwood"] = {
 }
 
 Paths["verdantbog2ford"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "s,se,sw,s,sw,se,se,s,s",
 		run : function(){
 			this.steps.split(",").forEach(function(direction){
@@ -1161,7 +1163,7 @@ Paths["verdantbog2ford"] = {
 }
 
 Paths["ford2treasuregolem"] = {
-		runRestDir : "n",
+		restRunDir : "n",
 		steps : "e,e,se,s,sw,s,s,sw,s,s,s,s,sw,s,se,se,e,se,e,se,se,e,se,ne,e,ne,n,se,e,ne,n,ne,n,ne,n,ne,n,d,e,se,se,d,e,e,e,e,e,n,e,n,d,se,e,e,d,n,w,s",
 		run : function(){
 			this.steps.split(",").forEach(function(direction){
@@ -1171,7 +1173,7 @@ Paths["ford2treasuregolem"] = {
 }
 
 Paths["treasuregolem2ford"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : Paths.ford2treasuregolem.steps.split(',').reverse().toString(),
 		run : function(){
 			this.steps.split(",").forEach(function(direction){
@@ -1181,7 +1183,7 @@ Paths["treasuregolem2ford"] = {
 }
 
 Paths["ford2verdantbog"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : Paths.verdantbog2ford.steps.split(',').reverse().toString(),
 		run : function(){
 			this.steps.split(",").forEach(function(direction){
@@ -1191,7 +1193,7 @@ Paths["ford2verdantbog"] = {
 }
 
 Paths["ford2southport"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "s,s,se,s,s,sw,s,s,s,s,sw,s,s,s,se,se,s,s,se,s,s,s,sw,s,s,s,sw,s,se,s,s,s,s,sw,s,s,s,s,s,s,sw,sw,sw,s,s,s,s,s,s,s,s,s,s,s,s,s,s,w,u,w,w,w,n,n,u",
 		run : function(){
 			this.steps.split(",").forEach(function(direction){
@@ -1201,7 +1203,7 @@ Paths["ford2southport"] = {
 }
 
 Paths["southport2ford"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : Paths.ford2southport.steps.split(",").reverse().toString(),
 		run : function(){
 			this.steps.split(",").forEach(function(direction){
@@ -1211,7 +1213,7 @@ Paths["southport2ford"] = {
 }
 
 Paths["bonemonstrosity2ford"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : "n,n,nw,s,s,s,sw,s,sw,s,ne,n,n,n,ne,n,n,n,nw,n,n,nw,nw,n,n,n,ne,n,n,n,n,ne,n,n,nw,n,n",
 		run : function(){
 			this.steps.split(",").forEach(function(direction){
@@ -1221,7 +1223,7 @@ Paths["bonemonstrosity2ford"] = {
 }
 
 Paths["ford2bonemonstrosity"] = {
-		runRestDir : "",
+		restRunDir : "",
 		steps : Paths.bonemonstrosity2ford.steps.split(",").reverse().toString(),
 		run : function() {
 			this.steps.split(",").forEach(function(direction){
@@ -1231,7 +1233,7 @@ Paths["ford2bonemonstrosity"] = {
 }
 
 Paths['ford2massivechuul'] = {
-		runRestDir : "s",
+		restRunDir : "s",
 		steps : "e,e,se,s,sw,s,s,sw,s,s,s,s,sw,s,se,se,e,se,s,se,se,se,e,se,e,ne,ne,se,ne,e,se,se,e,se,s,se,e,se,ne,nw,n",
 		run : function(){
 			this.steps.split(",").forEach(function(dir){
@@ -1291,8 +1293,8 @@ Paths['magister2sunkenshrine'] = {
 }
 
 Paths['sunkenshrine2prophet'] = {
-		restRunDir : "e",
-		steps : "e,ne,ne,d,e,e,e,e,e,s,w,d,w,w,w",
+		restRunDir : "e,e",
+		steps : "e,ne,ne,d,e,e,e,e,e,s,s,w,u,w,w,w",
 		run : function(){
 			this.steps.split(",").forEach(function(dir){
 				MoveClick(dir);
@@ -1311,7 +1313,7 @@ Paths['prophet2sunkenshrine'] = {
 }
 
 Paths['sunkenshrine2fallen'] = {
-		restRunDir: "s",
+		restRunDir : "s",
 		steps : "e,ne,ne,d,e,e,e,e,e,s,e,d,ne,e,n,n",
 		run : function(){
 			this.steps.split(",").forEach(function(dir){
@@ -1390,6 +1392,65 @@ Paths['trainer2dryad'] = {
 		}
 }
 
+Paths['stonewood2faunus'] = {
+		restRunDir : "ne,n,se",
+		steps : "sw,sw,s,se,e,s,sw,s,sw,s,se,s,se,s,s,se,sw,s,sw,w,nw,ne,nw,nw,s,se",
+		run : function(){
+			this.steps.split(",").forEach(function(dir){
+				MoveClick(dir);
+			})
+		}
+}
+
+Paths['faunus2stonewood'] = {
+		restRunDir : "",
+		steps : Paths['stonewood2faunus'].steps.split(",").reverse().toString(),
+		run : function(){
+			this.steps.split(",").forEach(function(dir){
+				MoveClick(reverseDirection(dir));
+			})
+		}
+}
+
+Paths['thelras2stonewood'] = {
+		restRunDir : "",
+		steps : "w,nw,d,w,sw,nw,d,n,nw,sw,w,nw,w,ne,ne",
+		run : function(){
+			this.steps.split(",").forEach(function(dir){
+				MoveClick(dir);
+			})
+		}
+}
+
+Paths['stonewood2thelras'] = {
+		restRunDir : "w",
+		steps : Paths['thelras2stonewood'].steps.split(",").reverse().toString(),
+		run : function(){
+			this.steps.split(",").forEach(function(dir){
+				MoveClick(reverseDirection(dir));
+			})
+		}
+}
+
+Paths['ford2sivwarchief'] = {
+		restRunDir : "n,nw,w",
+		steps : "e,e,se,e,ne,ne,ne,ne,e,ne,n,se,e,se,se,s,se,e,ne,ne,nw,n,n,w,w,w,n,ne,e,e,se,s",
+		run : function(){
+			this.steps.split(",").forEach(function(dir){
+				MoveClick(dir);
+			})
+		}
+}
+
+Paths['sivwarchief2ford'] = {
+		restRunDir : "",
+		steps : Paths['ford2sivwarchief'].steps.split(",").reverse().toString(),
+		run : function(){
+			this.steps.split(",").forEach(function(dir){
+				MoveClick(reverseDirection(dir));
+			})
+		}
+}
 
 function setDesiredItems(items){
 	if(items != ""){
@@ -1585,6 +1646,8 @@ function ConfigureUI(){
 			\
 	</div>').insertAfter("#commandBtns");
 
+	$('<span style="float:left;">Set Run Dir?: <input type="checkbox" onclick="shouldSetRunDir = !shouldSetRunDir;"></span>').insertAfter($("#PathDropDown"));
+	
 	var thePaths = [];
 	for (var key in Paths) {
 		if (Paths.hasOwnProperty(key)) {
@@ -1601,6 +1664,7 @@ function ConfigureUI(){
 
 		if(inArrayVal != -1){
 			$("#message").val("");
+			running = true;
 			var pathCmd = Paths[PathTriggerCmd.split("#")[1]];
 			pathCmd.run();
 			if(shouldSetRunDir){
@@ -1609,6 +1673,7 @@ function ConfigureUI(){
 				scriptRunDirection = pathCmd.restRunDir;
 				$("#mainScreen").append("<span style='color: cyan'>You will now run: </span><span style='color: yellow'>" + scriptRunDirection + "," + "<span style='color: cyan'> before resting.</span><br />");
 			}
+			running = false;
 			sendMessageDirect("");
 		} else if(PathTriggerCmd === "#menu"){
 			$("#message").val("");
@@ -1621,38 +1686,6 @@ function ConfigureUI(){
 			brief = !brief;
 		}
 
-
-
-
-//		case '#tangle2trainer': //Start this from the lair room with a south exit in the tanglewood area.
-
-//		$('#message').val(""); //This clears the text box after your command is recognized.
-
-////		$("#chkEnableAI").click();
-
-//		var trainer2tangle = "n,ne,ne,ne,nw,nw,w,nw,nw,sw,w,sw,sw,s,sw,sw,w,s,sw,sw,sw,s,se,s,sw,w,nw,w,sw,w,sw,w,sw,sw,sw,w,w,d,w,sw,nw,n";
-//		trainer2tangle.split(",").reverse().forEach(function(dir){
-//		MoveClick(reverseDirection(dir));
-//		});
-
-////		$("#chkEnableAI").click();
-
-//		break;
-
-//		case '#trainer2tangle': //Start this from the starting town trainer room
-
-//		$('#message').val(""); //This clears the text box after your command is recognized.
-
-////		$("#chkEnableAI").click();
-
-//		var trainer2tangle = "n,ne,ne,ne,nw,nw,w,nw,nw,sw,w,sw,sw,s,sw,sw,w,s,sw,sw,sw,s,se,s,sw,w,nw,w,sw,w,sw,w,sw,sw,sw,w,w,d,w,sw,nw,n";
-//		trainer2tangle.split(",").forEach(function(dir){
-//		MoveClick(dir);
-//		});
-
-////		$("#chkEnableAI").click();
-
-//		break;
 
 //		case '#stonewood2harpy':
 
@@ -1684,33 +1717,6 @@ function ConfigureUI(){
 ////		$("#chkEnableAI").click();
 
 //		break;
-//		case '#stonewood2faunus':
-//		$('#message').val(""); //This clears the text box after your command is recognized.
-
-////		$("#chkEnableAI").click();
-
-//		var stonewood2faunus = "sw,sw,s,se,e,s,sw,s,sw,s,se,d,s,se,s,s,se,sw,s,sw,w,nw,ne,nw,nw,s,se";
-//		stonewood2faunus.split(",").forEach(function(dir){
-//		MoveClick(dir);
-//		});
-
-////		$("#chkEnableAI").click();
-//		break;
-//		case '#faunus2stonewood':
-
-//		$('#message').val(""); //This clears the text box after your command is recognized.
-
-////		$("#chkEnableAI").click();
-
-//		var stonewood2faunus = "sw,sw,s,se,e,s,sw,s,sw,s,se,d,s,se,s,s,se,sw,s,sw,w,nw,ne,nw,nw,s,se";
-//		stonewood2faunus.split(",").reverse().forEach(function(dir){
-//		MoveClick(reverseDirection(dir));
-//		});
-
-////		$("#chkEnableAI").click();
-
-//		break;
-
 //		case '#gnarledancient2stonewood':
 //		$('#message').val(""); //This clears the text box after your command is recognized.
 
@@ -1736,38 +1742,6 @@ function ConfigureUI(){
 
 ////		$("#chkEnableAI").click();
 //		break;
-
-//		case '#ford2graveyard': //Start this from the Natural Ford Crossing in the river.
-
-//		$('#message').val(""); //This clears the text box after your command is recognized.
-
-////		$("#chkEnableAI").click();
-
-//		var graveyard2ford = "ne,n,ne,n,nw,ne,ne,ne,e,e,ne,e,ne,e,se,ne,ne,e,ne,nw,n,ne,e,ne,e,se,e,e,s,sw,s,s,sw,s,s,s,se,se,s,se,s,s,s,s,sw,s,sw,s,s,s,sw,sw,s,s,sw,sw,s,s,s,s,sw,s,se,e,se,s,s,sw,s,s,sw,sw,s,sw,s,se,s,s,s,se,s,s,se,s,s,s,s,se,se,se";
-//		graveyard2ford.split(",").reverse().forEach(function(dir){
-//		MoveClick(reverseDirection(dir));
-//		});
-
-////		$("#chkEnableAI").click();
-
-//		break;
-
-//		case '#graveyard2ford': //Start this from the Overgrown Graveyard Entrance Room
-
-//		$('#message').val(""); //This clears the text box after your command is recognized.
-
-////		$("#chkEnableAI").click();
-
-//		var graveyard2ford = "ne,n,ne,n,nw,ne,ne,ne,e,e,ne,e,ne,e,se,ne,ne,e,ne,nw,n,ne,e,ne,e,se,e,e,s,sw,s,s,sw,s,s,s,se,se,s,se,s,s,s,s,sw,s,sw,s,s,s,sw,sw,s,s,sw,sw,s,s,s,s,sw,s,se,e,se,s,s,sw,s,s,sw,sw,s,sw,s,se,s,s,s,se,s,s,se,s,s,s,s,se,se,se";
-//		graveyard2ford.split(",").forEach(function(dir){
-//		MoveClick(dir);
-//		});
-
-////		$("#chkEnableAI").click();
-
-//		break;
-
-
 //		case '#deepwoodtrainer2southporttrainer': //Start this from the starting town trainer room FULL RUN TO SouthportTrainer
 
 //		$('#message').val(""); //This clears the text box after your command is recognized.
@@ -1963,6 +1937,7 @@ function ConfigureObserver(){
 				restMana = true;
 			}
 			if(resting == false && count == 1 && (scripting)) {
+				running = true;
 				for(var i = 0; i < scriptRunDirection.split(",").length; i++){
 					MoveClick(scriptRunDirection.split(",")[i]);
 				}
@@ -1986,6 +1961,8 @@ function ConfigureObserver(){
 				for(var i = 0; i < reverse.length; i++){
 					MoveClick(reverseDirection(reverse[i]));
 				}
+				running = false;
+				sendMessageDirect("");
 				count += 1;
 			}
 		}
@@ -2004,7 +1981,7 @@ function ConfigurePlayer(){
 		//move & rest: comma separated, start room is fighting room
 		setRunDir("e");
 		setRestMinMax(40,100);
-//		setPrePostRest(pre,post);
+		setPrePostRest("wear coprolite, wear silver-runed, wear marshwood","wear polished onyx, wear heavy gold, wear serpent");
 
 		//healing
 		setMinorHeal(80,"mend");
@@ -2039,7 +2016,6 @@ function ConfigurePlayer(){
 	case "Charma": {
 		setRunDir("d");
 		setRestMinMax(40,97);
-		setMinorHeal(80,"");
 		break;
 	}
 	}
