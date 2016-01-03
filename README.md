@@ -2,10 +2,18 @@
 
 Use webmud-UI.js. Will be the latest version of my code.
 updated to incorporate Chupon's UI components.
-Thanks to Cyrix and Chupon for their input to help create this.
+Thanks to Cyrix, Chupon and Kap for their input to help create this.
 
 ------------------------------------
  * Blorgen's - Alternate UI and Script
+ *
+ * Version 1.9
+ *
+ * Fixed accidental doubling of exp/hr
+ * 
+ * auto-set rest directions will work, they are not all populated though so be careful,
+ * please send me through updates as you come across them.
+ * 
  *
  * Version 1.8
  * 

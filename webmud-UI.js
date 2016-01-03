@@ -1,6 +1,16 @@
 /*
  * Blorgen's - Alternate UI and Script
  * 
+ * 
+ * Version 1.9
+ * 
+ * Fixed accidental doubling of exp/hr
+ * 
+ * auto-set rest directions will work, they are not all populated though so be careful,
+ * please send me through updates as you come across them.
+ * 
+ * 
+ * 
  * Version 1.8
  * 
  * Auto-get items, add exact item name in ui and click on item to remove 
@@ -18,9 +28,6 @@
  * Auto-get does not work with coins - if enough of you want to get coins by choice I can work it in
  * At the moment the UI for get items will not stop, I have not continued adding items upon items. I usually clear what is not relevant to the area.
  * #menu does not auto-wrap at mainscreen boundaries (they all appear in the drop-down)
- * 
- * 
- * 
  * 
  * Version 1.7
  * 
@@ -68,7 +75,7 @@
  *
  * */
 //version number
-var version = 1.8;
+var version = 1.9;
 
 //stores the exp details
 var curEXP = 0;
@@ -84,6 +91,7 @@ var ExpGained = 0;
 var start = new Date().getTime();
 var time = 0;
 var elapsed = '0.0';
+var ephInterval = 2000;
 
 //room items
 var roomItems = {};
@@ -114,6 +122,8 @@ var preRestCommand = "";
 var postRestCommand = "";
 var shouldSetRunDir = false;
 var running = false;
+var moveOnKill = false;
+var macTimeout = 500;
 
 //healing
 var minorHealBelowPercent = 80;
@@ -230,6 +240,10 @@ window.gainExperience = function(actionData) {
 	ExpGained +=  +String(actionData.Experience);
 	curEXP += actionData.Experience;
 	updateEXPBar();
+	if(moveOnKill === true){
+		RunOut();
+		setTimeout(RunIn,macTimeout);
+	}
 }
 
 //TODO: update so click on name = telepath to person
@@ -248,7 +262,7 @@ function refreshPlayerList() {
 function MoveClick(moveValue){
 	var movementValue = moveValue;
 	sendMessageText(movementValue);
-	$('#message').focus();
+//	$('#message').focus();
 }
 
 //beginning of map screen I believe this will have to occur back of house.
@@ -678,7 +692,7 @@ var returnTimer = setInterval(function(){
 
 function instance()
 {
-	time += 1000;
+	time += ephInterval;
 
 	elapsed = Math.floor(time / 100) / 10;
 	if(Math.round(elapsed) == elapsed) { elapsed += '.0'; }
@@ -701,7 +715,7 @@ function instance()
 	}
 }
 
-var ephID = window.setInterval(instance, 2000);
+var ephID = window.setInterval(instance, ephInterval);
 
 //Numpad control of movement
 //numlock must be off
@@ -1440,6 +1454,26 @@ Paths['deepwoodtrainer2southporttrainer'] = {
 		}
 }
 
+Paths['deepwood2ruggedhighland'] = {
+		restRunDir : "",
+		steps : "ne,ne,ne,nw,nw,w,nw,nw,nw,w,nw,w,nw,w,sw,w,nw,nw,ne,nw,n,ne,ne,ne,e,ne,w,nw,nw,n,n,ne,ne,ne,e,ne,e,ne,e,se,e,e,ne,e,e,se,e,se,se,e,ne,ne,u,n,ne,e,ne,u,e,e,u,ne",
+		run : function(){
+			this.steps.split(",").forEach(function(dir){
+				MoveClick(dir);
+			})
+		}
+}
+
+Paths['ruggedhighland2deepwood'] = {
+		restRunDir : "",
+		steps : Paths['deepwood2ruggedhighland'].steps.split(',').reverse().toString(),
+		run : function(){
+			this.steps.split(",").forEach(function(dir){
+				MoveClick(reverseDirection(dir));
+			})
+		}
+}
+
 function setDesiredItems(items){
 	if(items != ""){
 		items.split(",").forEach(function(item){
@@ -1521,7 +1555,7 @@ function UpdateHealBuffValues(){
 
 	if (buffInterval < 1000){buffInterval = 1000;}
 	if (buff != undefined) {clearInterval(buff); buff = undefined;}
-	if (buff == undefined && buffSelfSpell != undefined && buffSelfSpell != ""){
+	if (scripting && buff == undefined && buffSelfSpell != undefined && buffSelfSpell != ""){
 		buff = setInterval(function(){sendMessageText(buffSelfSpell); sendMessageDirect("");},buffInterval);
 	}
 	if (minorHealBelowPercent > 100) {minorHealBelowPercent=100}
@@ -1634,6 +1668,7 @@ function ConfigureUI(){
 			\
 	</div>').insertAfter("#commandBtns");
 
+	$('<span style="display:block;">Move after combat?: <input type="checkbox" onclick="moveOnKill = !moveOnKill;"></span><span display:block;>MAC Timeout: <input type="number" style="width:5em" id="macTimeout" value="' + macTimeout + '" onchange="macTimeout = $(&quot;#macTimeout&quot;).val()"/></span>').insertBefore($("#RestMin").parent());
 	$('<span style="float:left;">Set Run Dir?: <input type="checkbox" onclick="shouldSetRunDir = !shouldSetRunDir;"></span>').insertAfter($("#PathDropDown"));
 	
 	var thePaths = [];
@@ -1834,9 +1869,7 @@ function ConfigureObserver(){
 			}
 			if(resting == false && count == 1 && (scripting)) {
 				running = true;
-				for(var i = 0; i < scriptRunDirection.split(",").length; i++){
-					MoveClick(scriptRunDirection.split(",")[i]);
-				}
+				RunOut();
 				if(preRestCommand != undefined && preRestCommand != ""){
 					for(var i = 0; i < preRestCommand.split(",").length; i++){
 						sendMessageText(preRestCommand.split(",")[i]);
@@ -1853,10 +1886,7 @@ function ConfigureObserver(){
 						sendMessageText(postRestCommand.split(",")[i]);
 					}
 				}
-				var reverse = scriptRunDirection.split(",").reverse();
-				for(var i = 0; i < reverse.length; i++){
-					MoveClick(reverseDirection(reverse[i]));
-				}
+				RunIn();
 				running = false;
 				sendMessageDirect("");
 				count += 1;
@@ -1869,13 +1899,27 @@ function ConfigureObserver(){
 	observer.observe($("#hp").parent()[0],options);
 }
 
+// run methods
+function RunIn(){
+	var reverse = scriptRunDirection.split(",").reverse();
+	for(var i = 0; i < reverse.length; i++){
+		MoveClick(reverseDirection(reverse[i]));
+	}
+}
+
+function RunOut(){
+	for(var i = 0; i < scriptRunDirection.split(",").length; i++){
+		MoveClick(scriptRunDirection.split(",")[i]);
+	}
+}
+
 
 //sets up player/s upon starting game
 function ConfigurePlayer(){
 	switch (playerName){
 	case "Blorgen": {
 		//move & rest: comma separated, start room is fighting room
-		setRunDir("e");
+		setRunDir("w");
 		setRestMinMax(40,100);
 		setPrePostRest("wear coprolite, wear silver-runed, wear marshwood","wear polished onyx, wear heavy gold, wear serpent");
 
@@ -1893,7 +1937,7 @@ function ConfigurePlayer(){
 	}
 	case "Bjorgen": {
 		//move & rest: comma separated, start room is fighting room
-		setRunDir("e");
+		setRunDir("w");
 		setRestMinMax(40,100);
 		setPrePostRest("wear marshwood","wear serpent");
 
@@ -1910,7 +1954,7 @@ function ConfigurePlayer(){
 		break;
 	}
 	case "Charma": {
-		setRunDir("d");
+		setRunDir("s");
 		setRestMinMax(40,97);
 		setPrePostRest("wear coprolite","wear polished onyx")
 		break;
