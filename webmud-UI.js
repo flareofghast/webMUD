@@ -1,6 +1,10 @@
 /*
  * Blorgen's - Alternate UI and Script
  * 
+ * Version 1.9.1
+ * 
+ * moved the settings link to end of command buttons
+ * scroll window down to top of mainScreen
  * 
  * Version 1.9
  * 
@@ -75,7 +79,7 @@
  *
  * */
 //version number
-var version = 1.9;
+var version = 1.9.1;
 
 //stores the exp details
 var curEXP = 0;
@@ -550,16 +554,19 @@ window.spellWearsOff = function(actionData) {
 	wm_spellWearsOff(actionData);
 }
 
-var wm_combatRound = window.combatRound;
-window.combatRound = function(actionData) {
-	wm_combatRound(actionData);
-//	if(minorHeal){
-//	sendMessageDirect(minorHealSelfSpell);
-//	} else if(majorHeal){
-//	sendMessageDirect(majorHealSelfSpell);
+var wm_combatSwing = window.combatSwing;
+window.combatSwing = function(actionData) {
+	wm_combatSwing(actionData);
+//	var total = 0;
+//	var self = false;
+//	if (actionData.AttackerID == playerID) {
+//		self = true;
+//		console.log("self = " + self);
+//	}
+//	if(self === true){
+//		console.log(actionData);
 //	}
 }
-
 
 //register on click function that either toggles the display of the tools or adds the new divs and checkboxes etc
 function ToolsButton(){
@@ -836,6 +843,8 @@ var wm_showRoom = window.showRoom;
 window.showRoom = function(actionData) {
 	if(brief === true){actionData.Description = ""}
 	wm_showRoom(actionData);
+	
+	//console.log(actionData);
 	// logic to map each room
 	if(mapping){
 		room.Name = actionData.Name;
@@ -1642,11 +1651,18 @@ function ConfigureUI(){
 	$("#divMainPanel").html($("#divMainPanel").children())
 	$('#chkEnableAI').remove();
 
-
 //	add the new stuff
 	$('<div id="divControls" class="panel col-xs-6 col-sm-6 col-md-3 col-lg-3" style="float:left; height:32em; width:21em;"><div style="width:100%"><span>AI: <input type="checkbox" id="chkEnableAI" value="Enable AI"> | </span><span>Scripting: <input type="checkbox" id="EnableScripting" onclick="ScriptingToggle()"> | </span><span>Scroll to Bottom: <input id="scrollToBottom" type="checkbox" checked="true"></div><div style="float:left;width:100%" class="input-group-sm"><input type="text" class="form-control" style="width:100%;max-width:750px;display:inline-block" id="message" autocomplete="false" autocorrect="false"><input type="button" class="btn" style="width:80px;height:30px;padding:0;" id="sendmessage" value="Send" onclick="sendMessage();"></div><div id="commandBtns" style="width:100%; padding:1em 0 0 0; float:left;"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="conversationsBtn" value="Conversations" onclick="openConvo()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="statsBtn" value="Stats" onclick="statsWindowOpen()"><input type="button" class="btn" style="width:5em; height:2em; padding:0;" id="mapButton" value="Map" onclick="openMapScreen()"><input type="button" class="btn" style="width:7em; height:2em; padding:0;" id="expButton" value="Reset Exp/h" onclick="ResetExpPH()"><input type="button" value="Tools" id="tools" style="width:5em; height:2em; padding:0;" class="btn" onclick="ToolsButton()"></div></div><div id="progressMonitors" style="float:left; width:21em;"><div style="float:left; width:100%; padding:0 0 0 1em;"><label id="ExpPerHour">0 Exp/h | Approx. Infinity hours to level</label></div><div id="hpContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">HP:</div><div class="progress" style="width:90%"><div class="progress-bar" style="width: 100%; background-color: rgb(230, 46, 0);"><span id="hp">151 / 151</span></div></div></div><div id="maContainer" style="width:100%; float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">MA:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width:100%; background-color:#3366ff;"><span id="ma">3 / 3</span></div></div></div><div id="expContainer" style="width:100%;float:left; height:1.5em;"><div style="text-align:center;width:10%;font-weight:200; float:left;">EXP:</div><div class="progress" style="width:90%;"><div class="progress-bar" style="width: 83%; background-color: rgb(0, 179, 0);"><span id="exp">0</span></div></div></div></div>').insertAfter("#mainScreen");
 	$("#commandBtns").prepend('<span id="version" style="width:100%; float:left; font-size:smaller;">Blorgen\'s script v' + version + '</span>')
 
+//  move settings link to a button in command buttons
+	$("a").filter(':contains("Settings")').html("<input type='button' value='AI Settings' class='btn' style='width:6em; height:2em; padding:0;'>").appendTo("#commandBtns");
+	
+//  scroll window to top of div
+	$('html, body').animate({
+        scrollTop: $('#mainScreen').offset().top - 52
+    }, 'slow');
+	
 	$('<div style="width:100%;"> \
 			<!-- Nav tabs --> \
 			<ul class="nav nav-tabs" role="tablist"> \
@@ -1670,7 +1686,7 @@ function ConfigureUI(){
 
 	$('<span style="display:block;">Move after combat?: <input type="checkbox" onclick="moveOnKill = !moveOnKill;"></span><span display:block;>MAC Timeout: <input type="number" style="width:5em" id="macTimeout" value="' + macTimeout + '" onchange="macTimeout = $(&quot;#macTimeout&quot;).val()"/></span>').insertBefore($("#RestMin").parent());
 	$('<span style="float:left;">Set Run Dir?: <input type="checkbox" onclick="shouldSetRunDir = !shouldSetRunDir;"></span>').insertAfter($("#PathDropDown"));
-	
+
 	var thePaths = [];
 	for (var key in Paths) {
 		if (Paths.hasOwnProperty(key)) {
@@ -1899,7 +1915,7 @@ function ConfigureObserver(){
 	observer.observe($("#hp").parent()[0],options);
 }
 
-// run methods
+//run methods
 function RunIn(){
 	var reverse = scriptRunDirection.split(",").reverse();
 	for(var i = 0; i < reverse.length; i++){

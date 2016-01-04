@@ -6,7 +6,12 @@ Thanks to Cyrix, Chupon and Kap for their input to help create this.
 
 ------------------------------------
  * Blorgen's - Alternate UI and Script
- *
+ * 
+ * Version 1.9.1
+ * 
+ * moved the settings link to end of command buttons
+ * scroll window down to top of mainScreen
+ * 
  * Version 1.9
  *
  * Fixed accidental doubling of exp/hr
