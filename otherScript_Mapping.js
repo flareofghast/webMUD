@@ -2146,6 +2146,33 @@ function autoMapGo(type) {
     });
 }
 
+function autoMapWalk(endID) {
+	  let start = curRoomID;
+	  let end = endID;
+	  let useAltName = checkAltName(end);
+
+	      findAutoPath(start, end)
+	        .then(function(result) {
+	          let pathString = result;
+	          let steps = pathString.split(',').length;
+	          let delay = document.getElementById('stepDelay').value;
+	          let dest = 'AutoMap walk to ' + document.getElementById('autoRoom').value;
+
+	          if (pathString) {
+	            notifyPlayer('yellowgreen', dest + ' (' + steps + ' steps)');
+
+	            walkPath(pathString, delay, false, dest);
+
+	          } else {
+	            let displayString = 'No path found to destination room';
+	            notifyPlayer('yellow', displayString);
+	          }
+	        })
+	    .catch(function(err) {
+	      console.error(err);
+	    });
+	}
+
 function reloadAutoEditSel() {
   //reload the autopath group and path selectors (partially async)
   let allRooms = [];
